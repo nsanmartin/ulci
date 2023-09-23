@@ -1,0 +1,6 @@
+[submodule "utest.h"]
+	path = utest.h
+	url = https://github.com/sheredom/utest.h
+[submodule "bdwgc"]
+	path = bdwgc
+	url = https://github.com/ivmai/bdwgc
