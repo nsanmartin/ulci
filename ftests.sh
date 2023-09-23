@@ -5,6 +5,8 @@ NC='\033[0m' # No Color
 
 ANY_ERROR=false
 
+make build/parser
+
 while read ln; do
     OUT=$(echo $ln |./build/parser 2>&1)
     RV=$?
