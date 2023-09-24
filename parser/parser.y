@@ -17,19 +17,19 @@
 %token <sval> VAR
 %token EOL
 
-%nterm <termval> expression
+%nterm <termval> sub_expr
 %nterm <termval> app_expr
 %nterm <termval> simple_expr
 
 %%
 
-expression_list:
-    expression EOL { parser_read_expression($1); }
-    | expression_list expression EOL { parser_read_expression($2); }
+expression:
+    sub_expr EOL { parser_read_expression($1); }
+    | expression sub_expr EOL { parser_read_expression($2); }
     ;
 
-expression:
-    LAMBDA VAR DOT expression {
+sub_expr:
+    LAMBDA VAR DOT sub_expr {
         Lterm* abs = lam_new_abs(lam_str($2), $4);
         $$ = abs;
     }
@@ -49,7 +49,7 @@ simple_expr:
         Lterm* var = lam_new_var(lam_str($1));
         $$ = var;
     }
-    | LPAREN expression RPAREN {
+    | LPAREN sub_expr RPAREN {
         $$ = $2;
     }
     ;

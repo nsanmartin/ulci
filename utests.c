@@ -27,7 +27,7 @@
 #define ASSERT_LTERM_EQ_STR(STR, LTERM)                                 \
     do {                                                                \
         const char* tstr;                                               \
-        tstr = lam_term_to_str(&LTERM).s;                               \
+        tstr = lam_term_to_str_more_paren(&LTERM).s;                               \
         ASSERT_NE((intptr_t)tstr, 0);                                   \
         ASSERT_LTERM_NOTNULL(tstr)                                      \
         ASSERT_STREQ(STR, tstr);                                        \

@@ -1,6 +1,8 @@
 #include <parser-lam-reader.h>
 
-void yyerror(const char* s) { fprintf(stderr, "error: %s\n", s); }
+void yyerror(const char* s) {
+    fprintf(stderr, "error: " RED "%s" RESET "\n", s);
+}
 
 Lterm* _last_lterm = 0x0;
 
@@ -16,11 +18,11 @@ Lterm* get_last_lam_term(void) {
     return _last_lterm;
 }
 
-Lstr parse_string(const char* in) {
+Lstr parse_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
   set_input_string(in);
   yyparse();
   end_lexical_scan();
-  Lstr rv = lam_term_to_str(get_last_lam_term());
+  Lstr rv = to_str(get_last_lam_term());
   return rv;
 }
 

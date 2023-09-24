@@ -86,7 +86,11 @@ int lam_init_var(Lterm t[static 1], Lstr x) ;
 int lam_init_abs(Lterm t[static 1], Lstr x, Lterm body[static 1]) ;
 int
 lam_init_app(Lterm t[static 1], Lterm fun[static 1], Lterm param[static 1]);
-Lstr lam_term_to_str(const Lterm t[static 1]) ;
+Lstr lam_term_to_str_more_paren(const Lterm t[static 1]) ;
+Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) ;
+static inline Lstr lam_term_to_str(const Lterm t[static 1]) {
+    return lam_term_to_str_more_paren(t);
+}
 bool lam_is_var_free_in(const Lterm t[static 1], Lstr n) ;
 int lam_max_reserved_var_len(const Lterm t[static 1]) ;
 Lstr lam_get_fresh_var_name(const Lterm t[static 1]) ;

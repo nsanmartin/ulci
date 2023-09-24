@@ -314,13 +314,13 @@ void lam_print_term_less_paren(const Lterm t[static 1]) {
 }
 
 
-Lstr lam_term_to_str(const Lterm t[static 1]) {
+Lstr lam_term_to_str_more_paren(const Lterm t[static 1]) {
     switch(t->tag) {
         case Lvartag: {
             return lam_strdup(t->var.name);
         }
         case Labstag: {
-            Lstr bstr = lam_term_to_str(t->abs.body);
+            Lstr bstr = lam_term_to_str_more_paren(t->abs.body);
             if (!bstr.s) {
                 perror("malloc returned null.");
                 return (Lstr){0};
@@ -340,12 +340,12 @@ Lstr lam_term_to_str(const Lterm t[static 1]) {
             return lam_allocated_str(buf);
         }
         case Lapptag: {
-            Lstr fstr = lam_term_to_str(t->app.fun);
+            Lstr fstr = lam_term_to_str_more_paren(t->app.fun);
             if (!fstr.s) {
                 perror("malloc returned null.");
                 return (Lstr){0};
             }
-            Lstr pstr = lam_term_to_str(t->app.param);
+            Lstr pstr = lam_term_to_str_more_paren(t->app.param);
             if (!pstr.s) {
                 perror("malloc returned null.");
                 return (Lstr){0};
@@ -365,26 +365,25 @@ Lstr lam_term_to_str(const Lterm t[static 1]) {
     }
 }
 
-//todo test this
 Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
     switch(t->tag) {
         case Lvartag: {
             return lam_strdup(t->var.name);
         }
         case Labstag: {
-            Lstr bstr = lam_term_to_str(t->abs.body);
+            Lstr bstr = lam_term_to_str_less_paren(t->abs.body);
             if (!bstr.s) {
                 perror("malloc returned null.");
                 return (Lstr){0};
             }
             size_t len = lam_strlen(bstr);
-            size_t lenrv = 1 + len + 4 + lam_strlen(t->abs.vname);
+            size_t lenrv = 1 + len + 2 + lam_strlen(t->abs.vname);
             char* buf = lam_malloc(sizeof(char) * lenrv);;
             if (!buf) {
                 perror("malloc returned null.");
                 return (Lstr){0};
             }
-            size_t n = snprintf(buf, lenrv, "(\\%s.%s)", t->abs.vname.s, bstr.s);
+            size_t n = snprintf(buf, lenrv, "\\%s.%s", t->abs.vname.s, bstr.s);
             if (n >= lenrv) {
                 perror("snprintf trucated string.");
                 return (Lstr){0};
@@ -392,26 +391,41 @@ Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
             return lam_allocated_str(buf);
         }
         case Lapptag: {
-            Lstr fstr = lam_term_to_str(t->app.fun);
+            Lstr fstr = lam_term_to_str_less_paren(t->app.fun);
             if (!fstr.s) {
                 perror("malloc returned null.");
                 return (Lstr){0};
             }
-            Lstr pstr = lam_term_to_str(t->app.param);
+            Lstr pstr = lam_term_to_str_less_paren(t->app.param);
             if (!pstr.s) {
                 perror("malloc returned null.");
                 return (Lstr){0};
             }
 
-            size_t lenrv = 1 + lam_strlen(fstr) + lam_strlen(pstr) + 1;
+            size_t nparen = 0;
+            const char* fmt = "%s %s";
+
+            if (t->app.fun->tag == Labstag && t->app.param->tag != Lvartag) {
+                nparen = 4;
+                fmt = "(%s) (%s)";
+            } else if (t->app.fun->tag == Labstag) {
+                nparen = 2;
+                fmt = "(%s) %s";
+            } else if (t->app.param->tag != Lvartag) {
+                nparen = 2;
+                fmt = "%s (%s)";
+            }
+
+            size_t lenrv = 1 + lam_strlen(fstr) + lam_strlen(pstr) + 1 + nparen;
             char* buf = lam_malloc(sizeof(char) * lenrv);
             if (!buf) { return LEMPTY_STR; }
-            size_t n = snprintf(buf, lenrv, "%s %s", fstr.s, pstr.s);
+            size_t n = snprintf(buf, lenrv, fmt, fstr.s, pstr.s);
             if (n >= lenrv) {
                 perror("snprintf trucated string.");
                 return (Lstr){0};
             }
             return lam_allocated_str(buf);
+            
         }
         default: LOG_INVALID_LTERM_AND_EXIT ;
     }
