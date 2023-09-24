@@ -96,5 +96,6 @@ bool lam_are_identical(const Lterm t[static 1], const Lterm u[static 1]) ;
 Lterm*
 lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) ;
 void lam_print_term(const Lterm t[static 1]) ;
+void lam_print_term_less_paren(const Lterm t[static 1]) ;
 
 #endif // __LAM_H_

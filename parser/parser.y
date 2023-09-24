@@ -1,9 +1,7 @@
 %code requires {
     #include <stdio.h>
     #include <lam.h>
-    #include <parser-util.h>
-
-
+    #include <parser-lam-reader.h>
 }
 
 %union {
@@ -26,8 +24,8 @@
 %%
 
 expression_list:
-    expression EOL { set_last_lam_term($1); }
-    | expression_list expression EOL { set_last_lam_term($2); }
+    expression EOL { parser_read_expression($1); }
+    | expression_list expression EOL { parser_read_expression($2); }
     ;
 
 expression:
@@ -58,9 +56,3 @@ simple_expr:
 
 %%
 
-#ifndef LAM_LIB_PARSER
-int main (void) {
-    yyin = stdin;
-    yyparse();
-}
-#endif

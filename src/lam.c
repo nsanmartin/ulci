@@ -289,6 +289,30 @@ void lam_print_term(const Lterm t[static 1]) {
     }
 }
 
+void lam_print_term_less_paren(const Lterm t[static 1]) {
+    switch(t->tag) {
+        case Lvartag: {
+            printf("%s", lam_str_to_cstr(t->var.name));
+            break;
+        }
+        case Labstag: {
+            printf("(\\%s.", lam_str_to_cstr(t->abs.vname));
+            lam_print_term_less_paren(t->abs.body);
+            printf(")");
+            break;
+        }
+        case Lapptag: {
+            //printf("(");
+            lam_print_term_less_paren(t->app.fun);
+            printf(" ");
+            lam_print_term_less_paren(t->app.param);
+            //printf(")");
+            break;
+        }
+        default: LOG_INVALID_LTERM_AND_EXIT ;
+    }
+}
+
 
 Lstr lam_term_to_str(const Lterm t[static 1]) {
     switch(t->tag) {
@@ -331,6 +355,58 @@ Lstr lam_term_to_str(const Lterm t[static 1]) {
             char* buf = lam_malloc(sizeof(char) * lenrv);
             if (!buf) { return LEMPTY_STR; }
             size_t n = snprintf(buf, lenrv, "(%s %s)", fstr.s, pstr.s);
+            if (n >= lenrv) {
+                perror("snprintf trucated string.");
+                return (Lstr){0};
+            }
+            return lam_allocated_str(buf);
+        }
+        default: LOG_INVALID_LTERM_AND_EXIT ;
+    }
+}
+
+//todo test this
+Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
+    switch(t->tag) {
+        case Lvartag: {
+            return lam_strdup(t->var.name);
+        }
+        case Labstag: {
+            Lstr bstr = lam_term_to_str(t->abs.body);
+            if (!bstr.s) {
+                perror("malloc returned null.");
+                return (Lstr){0};
+            }
+            size_t len = lam_strlen(bstr);
+            size_t lenrv = 1 + len + 4 + lam_strlen(t->abs.vname);
+            char* buf = lam_malloc(sizeof(char) * lenrv);;
+            if (!buf) {
+                perror("malloc returned null.");
+                return (Lstr){0};
+            }
+            size_t n = snprintf(buf, lenrv, "(\\%s.%s)", t->abs.vname.s, bstr.s);
+            if (n >= lenrv) {
+                perror("snprintf trucated string.");
+                return (Lstr){0};
+            }
+            return lam_allocated_str(buf);
+        }
+        case Lapptag: {
+            Lstr fstr = lam_term_to_str(t->app.fun);
+            if (!fstr.s) {
+                perror("malloc returned null.");
+                return (Lstr){0};
+            }
+            Lstr pstr = lam_term_to_str(t->app.param);
+            if (!pstr.s) {
+                perror("malloc returned null.");
+                return (Lstr){0};
+            }
+
+            size_t lenrv = 1 + lam_strlen(fstr) + lam_strlen(pstr) + 1;
+            char* buf = lam_malloc(sizeof(char) * lenrv);
+            if (!buf) { return LEMPTY_STR; }
+            size_t n = snprintf(buf, lenrv, "%s %s", fstr.s, pstr.s);
             if (n >= lenrv) {
                 perror("snprintf trucated string.");
                 return (Lstr){0};

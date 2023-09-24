@@ -1,6 +1,6 @@
-#ifndef __PARSER_UTIL_H__
-#define __PARSER_UTIL_H__
-
+#ifndef __PARSER_LAM_READER_H__
+#define __PARSER_LAM_READER_H__
+#include <stdio.h>
 #include "lam.h"
 extern FILE* yyin;
 
@@ -14,13 +14,16 @@ void yyerror(const char* s) ;
 int yyparse(void) ;
 
 
-/* Declarations */
 void set_input_string(const char* in);
 void end_lexical_scan(void);
 
-/* This function parses a string */
 Lstr parse_string(const char* in) ;
 
-void set_last_lam_term(Lterm* t) ;
+int set_last_lam_term(Lterm t[static 1]) ;
 Lterm* get_lam_term(void) ;
+
+void set_input_string(const char* in);
+void end_lexical_scan(void);
+
+int parser_read_expression(Lterm t[static 1]) ;
 #endif

@@ -1,7 +1,7 @@
 // #include "parser.tab.c"
 #include <stdio.h>
 
-#include "parser-util.h"
+#include "parser-lam-reader.h"
 
 void test_parse_impl(const char* s, const char* r) {
     printf("parsing '%s' => %s\n", s, r);
@@ -21,4 +21,5 @@ int main (void) {
     test_parse("(\\x.(x x))");
     test_parse("(\\x.(x x))");
     test_parse("((\\x.xx) (\\x.xy))");
+    test_parse("(\\x.((y (\\x.xx)) ((\\x.y) (\\x.xy))))");
 }

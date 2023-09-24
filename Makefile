@@ -26,7 +26,7 @@ FLEX_OBJ=$(BUILD)/lex.yy.o
 BISON_SRC=$(BUILD)/parser.tab.c
 BISON_OBJ=$(BUILD)/parser.tab.o
 FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
-PARSER_UTIL=$(PARSER_DIR)/parser-util.c
+PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c
 
 
 
@@ -36,16 +36,16 @@ run-tests: $(BUILD)/utests $(BUILD)/itests
 
 
 $(BUILD)/utests: utests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_UTIL) 
-	$(CC) -DLAM_LIB_PARSER $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h  -I$(PARSER_INCLUDE) -o $@ $^ 
+	$(CC) $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h  -I$(PARSER_INCLUDE) -o $@ $^ 
 
 $(BUILD)/itests: itests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_UTIL)
-	$(CC) -DLAM_LIB_PARSER $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h -I$(PARSER_INCLUDE) -o $@ $^ 
+	$(CC) $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h -I$(PARSER_INCLUDE) -o $@ $^ 
 
 $(LAM_OBJDIR)/%.o: $(LAM_SRCDIR)/%.c $(LAM_HEADERS)
 	$(CC) $(LAMF) $(STRICT_CFLAGS) $(CFLAGS) -c -o $@  $<
 
 $(BUILD)/parser: $(FLEXBISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
-	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) -o $@ $^ -lfl
+	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) -o $@ $(PARSER_DIR)/parser.c $^ -lfl
 
 
 $(GCOBJ):
