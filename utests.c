@@ -27,7 +27,7 @@
 #define ASSERT_LTERM_EQ_STR(STR, LTERM)                                 \
     do {                                                                \
         const char* tstr;                                               \
-        tstr = lam_term_to_str_more_paren(&LTERM).s;                               \
+        tstr = lam_term_to_str_more_paren(&LTERM).s;                    \
         ASSERT_NE((intptr_t)tstr, 0);                                   \
         ASSERT_LTERM_NOTNULL(tstr)                                      \
         ASSERT_STREQ(STR, tstr);                                        \
@@ -210,7 +210,6 @@ UTEST(rename, A) {
 }
 
 UTEST(lam_clone, A) {
-    //Lterm x = LVAR(X);
     const Lterm* x2 = lam_clone(&LVAR(X));
     ASSERT_FALSE((&LVAR(X) == x2));
     ASSERT_STREQ("Variable", lam_get_form_name_cstr(x2));
@@ -295,4 +294,38 @@ UTEST(substitute, renaming_var) {
     Lterm xResVarName = LAPP(LVAR(X),LVAR(RES_CHAR1));
     Lterm ly_xResVarName = LABS(Y, xResVarName);
     ASSERT_TRUE(lam_are_identical(substituted, &ly_xResVarName));
+}
+
+UTEST(strcmp, lam_str) {
+    ASSERT_TRUE(lam_str_eq(LEMPTY_STR, lam_str("")));
+    ASSERT_TRUE(lam_str_eq(lam_str(""), lam_str("")));
+    ASSERT_TRUE(lam_str_eq(lam_str("a"), lam_str("a")));
+    ASSERT_TRUE(lam_str_eq(lam_str("ab"), lam_str("ab")));
+    ASSERT_TRUE(lam_str_eq(lam_str("abc"), lam_str("abc")));
+    ASSERT_TRUE(lam_str_eq(lam_str("abcx0x0x0"), lam_str("abcx0x0x0")));
+
+    ASSERT_FALSE(lam_str_eq(lam_str("a"), lam_str("")));
+    ASSERT_FALSE(lam_str_eq(lam_str(""), lam_str("a")));
+    ASSERT_FALSE(lam_str_eq(lam_str("a"), lam_str("ab")));
+    ASSERT_FALSE(lam_str_eq(lam_str("ab"), lam_str("a")));
+    ASSERT_FALSE(lam_str_eq(lam_str(""), lam_str("aaaaaa")));
+    ASSERT_FALSE(lam_str_eq(lam_str("bbb"), lam_str("aaa")));
+}
+
+UTEST(strcmp, lam_strdup_str) {
+    ASSERT_TRUE(lam_str_eq(lam_str(""), lam_strdup(LEMPTY_STR)));
+    ASSERT_TRUE(lam_str_eq(lam_str(""), lam_strdup(lam_str(""))));
+    ASSERT_TRUE(lam_str_eq(lam_str("a"), lam_strdup(lam_str("a"))));
+    ASSERT_TRUE(lam_str_eq(lam_str("ab"), lam_strdup(lam_str("ab"))));
+    ASSERT_TRUE(lam_str_eq(lam_str("abc"), lam_strdup(lam_str("abc"))));
+    ASSERT_TRUE(lam_str_eq(lam_str("abcx0x0x0"),  lam_strdup(lam_str("abcx0x0x0"))));
+
+    ASSERT_FALSE(lam_str_eq(lam_str("a"), lam_strdup(lam_str(""))));
+    ASSERT_FALSE(lam_str_eq(lam_str("a"), lam_strdup(LEMPTY_STR)));
+    ASSERT_FALSE(lam_str_eq(lam_str("a"), LEMPTY_STR));
+    ASSERT_FALSE(lam_str_eq(lam_str(""), lam_strdup(lam_str("a"))));
+    ASSERT_FALSE(lam_str_eq(lam_str("a"), lam_strdup(lam_str("ab"))));
+    ASSERT_FALSE(lam_str_eq(lam_str("ab"), lam_strdup(lam_str("a"))));
+    ASSERT_FALSE(lam_str_eq(lam_str(""), lam_strdup(lam_str("aaaaaa"))));
+    ASSERT_FALSE(lam_str_eq(lam_str("bbb"), lam_strdup(lam_str("aaa"))));
 }

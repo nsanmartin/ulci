@@ -5,12 +5,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-typedef struct { const char* s; int alloc; } Lstr;
+typedef struct { const char* s; size_t len; } Lstr;
 
-#define lam_str(S) (Lstr){.s=S, .alloc=0}
-#define lam_allocated_str(S) (Lstr){.s=S, .alloc=1}
-
-#define LEMPTY_STR (Lstr){0}
+#define LEMPTY_STR (Lstr){.s="",.len=0}
 
 static inline char* lam_str_to_cstr(Lstr s) {
     return (char*)s.s;
@@ -25,25 +22,29 @@ static inline char* lam_strdup_str(size_t len, const char* s) {
 }
 
 static inline Lstr lam_strdup(Lstr s) {
-    const char* copy = s.s;
-    int alloc = 0;
-    if(s.alloc) {
-        size_t len = strlen(s.s);
-        copy = lam_strdup_str(len, s.s);
-        alloc = copy != 0x0;
+    const char* copy = 0x0;
+    if(s.s) {
+        copy = lam_strdup_str(s.len, s.s);
     }
-    return (Lstr) {.s=copy, .alloc=alloc};
+    return (Lstr) {.s=copy, .len=s.len};
+}
+
+static inline Lstr lam_str(const char* s) {
+    return (Lstr){.s=s, .len=strlen(s)};
 }
 
 static inline bool lam_str_null(Lstr s) {
     return !s.s;
 }
 
+static inline int lam_str_eq(Lstr s, Lstr t) {
+    return s.len == t.len && strncmp(lam_str_to_cstr(s), lam_str_to_cstr(t), s.len) == 0;
+}
+
 static inline int lam_strcmp(Lstr s, Lstr t) {
     return strcmp(lam_str_to_cstr(s), lam_str_to_cstr(t));
 }
 
-//todo: store str len
 static inline size_t lam_strlen(Lstr s) {
     return strlen(s.s);
 }
