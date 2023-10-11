@@ -1,4 +1,7 @@
 build
 TAGS
 tags
+cscope.*
+s.vim
+*.swp
 

@@ -14,11 +14,11 @@
 ")"                     { return RPAREN; }
 "\\"                    { return LAMBDA; }
 [a-zA-Z][a-zA-Z0-9_]*   {
-    char* text = lam_strdup_str(strlen(yytext), yytext);
+    char* text = strdup(yytext);
     yylval.sval = text;
     return VAR;
 }
-"\n"                    { return EOL; }
+[\n;]                    { return EOL; }
 
 %%
 

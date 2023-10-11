@@ -24,6 +24,7 @@ void set_input_string(const char* in);
 void end_lexical_scan(void);
 
 Lstr parse_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) ;
+Lstr eval_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) ;
 
 int set_last_lam_term(Lterm t[static 1]) ;
 Lterm* get_lam_term(void) ;
@@ -32,4 +33,5 @@ void set_input_string(const char* in);
 void end_lexical_scan(void);
 
 int parser_read_expression(Lterm t[static 1]) ;
+void parser_set_repl_fn(void) ;
 #endif

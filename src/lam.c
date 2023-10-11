@@ -1,29 +1,10 @@
 #define _GNU_SOURCE
 //#include <gc/gc.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
 #include "lam.h"
 #include "mem.h"
-
-#define LOG_INVALID_LTERM                                              \
-        fprintf(                                                       \
-            stderr,                                                    \
-            "\033[91m"                                                 \
-            "lam fatal error:\n================"                       \
-            "\033[0m"                                                  \
-            "\n\tInvalid term form.\n"                                 \
-                "file: %s"                                             \
-                ":%d\n"                                                \
-                "func: %s\n",                                          \
-                __FILE__,                                              \
-                __LINE__,                                              \
-                __func__)
-
-#define LOG_INVALID_LTERM_AND_EXIT                                     \
-    LOG_INVALID_LTERM; exit(EXIT_FAILURE)
 
 long used_fresh_vars = 0;
 
@@ -197,21 +178,21 @@ lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
             }
         }
         case Labstag: {
-            if (!lam_str_eq(t->abs.vname, x)
-                && lam_is_var_free_in(t->abs.body, x)) {
+            if (lam_is_var_free_in(t,x)) {
 
-                const Lterm* r = s;
-                if (lam_is_var_free_in(s, x)) {
-                    r = lam_clone(r);
-                    if (!r) { return 0x0; }
-                    Lstr fresh_name = lam_get_fresh_var_name(r);
+                Lterm* u = (Lterm*)t;
+                if (lam_is_var_free_in(s, t->abs.vname)) {
+                    u = lam_clone(u);
+                    if (!u) { return 0x0; }
+                    Lstr fresh_name = lam_get_fresh_var_name(u);
                     if (lam_str_null(fresh_name)) { return 0x0; }
-                    lam_rename_var((Lterm*)r, t->abs.vname, fresh_name);
+                    lam_rename_var(u->abs.body, u->abs.vname, fresh_name);
+					u->abs.vname = fresh_name;
                 }
 
-                Lterm* subst = lam_substitute(t->abs.body, x, r);
+                Lterm* subst = lam_substitute(u->abs.body, x, s);
                 if (!subst) { return 0x0; }
-                Lstr vn = t->abs.vname;
+                Lstr vn = u->abs.vname;
                 if (lam_str_null(vn)) { return 0x0; }
                 Lterm* rv = lam_malloc(sizeof (*rv));
                 if (!rv) { return 0x0; }
@@ -321,19 +302,19 @@ Lstr lam_term_to_str_more_paren(const Lterm t[static 1]) {
             Lstr bstr = lam_term_to_str_more_paren(t->abs.body);
             if (!bstr.s) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             size_t len = lam_strlen(bstr);
             size_t lenrv = 1 + len + 4 + lam_strlen(t->abs.vname);
             char* buf = lam_malloc(sizeof(char) * lenrv);;
             if (!buf) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             size_t n = snprintf(buf, lenrv, "(\\%s.%s)", t->abs.vname.s, bstr.s);
             if (n >= lenrv) {
                 perror("snprintf trucated string.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             return lam_str(buf);
         }
@@ -341,21 +322,21 @@ Lstr lam_term_to_str_more_paren(const Lterm t[static 1]) {
             Lstr fstr = lam_term_to_str_more_paren(t->app.fun);
             if (!fstr.s) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             Lstr pstr = lam_term_to_str_more_paren(t->app.param);
             if (!pstr.s) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
 
             size_t lenrv = 1 + lam_strlen(fstr) + lam_strlen(pstr) + 3;
             char* buf = lam_malloc(sizeof(char) * lenrv);
-            if (!buf) { return LEMPTY_STR; }
+            if (!buf) { return LEMPTY_STR(); }
             size_t n = snprintf(buf, lenrv, "(%s %s)", fstr.s, pstr.s);
             if (n >= lenrv) {
                 perror("snprintf trucated string.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             return lam_str(buf);
         }
@@ -372,19 +353,19 @@ Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
             Lstr bstr = lam_term_to_str_less_paren(t->abs.body);
             if (!bstr.s) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             size_t len = lam_strlen(bstr);
             size_t lenrv = 1 + len + 2 + lam_strlen(t->abs.vname);
             char* buf = lam_malloc(sizeof(char) * lenrv);;
             if (!buf) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             size_t n = snprintf(buf, lenrv, "\\%s.%s", t->abs.vname.s, bstr.s);
             if (n >= lenrv) {
                 perror("snprintf trucated string.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             return lam_str(buf);
         }
@@ -392,39 +373,68 @@ Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
             Lstr fstr = lam_term_to_str_less_paren(t->app.fun);
             if (!fstr.s) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             Lstr pstr = lam_term_to_str_less_paren(t->app.param);
             if (!pstr.s) {
                 perror("malloc returned null.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
 
             size_t nparen = 0;
             const char* fmt = "%s %s";
 
-            if (t->app.fun->tag == Labstag && t->app.param->tag != Lvartag) {
+            // "%s %s":
+            // app var
+            // var var
+
+            // "(%s) (%s)"
+            // abs app
+
+            // "%s (%s)"
+            // var app
+            // var abs
+            // app abs
+            // app app
+
+            // "(%s) %s"
+            // abs abs
+            // abs var
+
+            if (t->app.fun->tag != Labstag && t->app.param->tag == Lvartag) {
+            } else if (t->app.fun->tag == Labstag && t->app.param->tag == Lapptag) {
                 nparen = 4;
                 fmt = "(%s) (%s)";
-            } else if (t->app.fun->tag == Labstag) {
-                nparen = 2;
-                fmt = "(%s) %s";
-            } else if (t->app.param->tag != Lvartag) {
+            } else if ((t->app.fun->tag == Lvartag && t->app.param->tag != Lvartag)
+                    || (t->app.fun->tag == Lapptag && t->app.param->tag != Lvartag)){
                 nparen = 2;
                 fmt = "%s (%s)";
+            } else if ((t->app.fun->tag == Labstag && t->app.param->tag == Labstag)) {
+                nparen = 2;
+                fmt = "(%s) %s";
             }
 
             size_t lenrv = 1 + lam_strlen(fstr) + lam_strlen(pstr) + 1 + nparen;
             char* buf = lam_malloc(sizeof(char) * lenrv);
-            if (!buf) { return LEMPTY_STR; }
+            if (!buf) { return LEMPTY_STR(); }
             size_t n = snprintf(buf, lenrv, fmt, fstr.s, pstr.s);
             if (n >= lenrv) {
                 perror("snprintf trucated string.");
-                return LEMPTY_STR;
+                return LEMPTY_STR();
             }
             return lam_str(buf);
             
         }
         default: LOG_INVALID_LTERM_AND_EXIT ;
     }
+}
+
+bool lam_normal_form(const Lterm t[static 1]) {
+    return t->tag == Lvartag
+        || (t->tag == Labstag && lam_normal_form(t->abs.body))
+        || (t->tag == Lapptag
+                && (t->app.fun->tag != Labstag)
+                && lam_normal_form(t->app.fun)
+                && lam_normal_form(t->app.param))
+        ;
 }

@@ -4,33 +4,44 @@
 #include "mem.h"
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+
+#define LOG_INVALID_LTERM                                              \
+        fprintf(                                                       \
+            stderr,                                                    \
+            "\033[91m"                                                 \
+            "lam fatal error:\n================"                       \
+            "\033[0m"                                                  \
+            "\n\tInvalid term form.\n"                                 \
+                "file: %s"                                             \
+                ":%d\n"                                                \
+                "func: %s\n",                                          \
+                __FILE__,                                              \
+                __LINE__,                                              \
+                __func__)
+
+#define LOG_INVALID_LTERM_AND_EXIT                                     \
+    LOG_INVALID_LTERM; exit(EXIT_FAILURE)
 
 typedef struct { const char* s; size_t len; } Lstr;
 
-#define LEMPTY_STR (Lstr){.s="",.len=0}
+static inline Lstr LEMPTY_STR() {
+    return  (Lstr){.s="",.len=0};
+}
 
 static inline char* lam_str_to_cstr(Lstr s) {
     return (char*)s.s;
 }
 
-
-static inline char* lam_strdup_str(size_t len, const char* s) {
-    char* copy = lam_malloc(len);
-    if (!copy) { return 0x0; }
-    memcpy(copy, s, len);
-    return copy;
-}
-
-static inline Lstr lam_strdup(Lstr s) {
-    const char* copy = 0x0;
-    if(s.s) {
-        copy = lam_strdup_str(s.len, s.s);
-    }
-    return (Lstr) {.s=copy, .len=s.len};
-}
-
 static inline Lstr lam_str(const char* s) {
     return (Lstr){.s=s, .len=strlen(s)};
+}
+
+static inline Lstr lam_str_dup(const char* s) {
+    size_t n = strlen(s);
+    return (Lstr){.s=strndup(s,n), .len=n};
 }
 
 static inline bool lam_str_null(Lstr s) {
@@ -103,4 +114,5 @@ lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) ;
 void lam_print_term(const Lterm t[static 1]) ;
 void lam_print_term_less_paren(const Lterm t[static 1]) ;
 
+bool lam_normal_form(const Lterm t[static 1]) ;
 #endif // __LAM_H_
