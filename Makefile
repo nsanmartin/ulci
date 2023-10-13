@@ -55,7 +55,7 @@ $(BUILD)/lex.yy.c: $(PARSER_DIR)/lexer.l $(BUILD)/parser.tab.c
 	flex -o $@ $<
 
 $(BISON_SRC): $(PARSER_DIR)/parser.y
-	bison -t -d -o $@ $<
+	bison -Werror=all -t -d -o $@ $<
 
 $(BISON_OBJ): $(BISON_SRC)
 	$(CC) -c -o $@ $^ -I$(LAM_INCLUDE) -I$(PARSER_INCLUDE)
