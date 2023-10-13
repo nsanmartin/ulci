@@ -55,7 +55,7 @@ $(BUILD)/lex.yy.c: $(PARSER_DIR)/lexer.l $(BUILD)/parser.tab.c
 	flex -o $@ $<
 
 $(BISON_SRC): $(PARSER_DIR)/parser.y
-	bison -Werror=all -t -d -o $@ $<
+	bison -Werror=all -Wcex -t -d -o $@ $<
 
 $(BISON_OBJ): $(BISON_SRC)
 	$(CC) -c -o $@ $^ -I$(LAM_INCLUDE) -I$(PARSER_INCLUDE)
@@ -72,5 +72,10 @@ cscope:
 
 clean:
 	find ./build/ -type f -delete
+
+
+bison: build/parser.tab.c
+bison-no-warnings:
+	bison -t -d -o $(BISON_SRC) $(PARSER_DIR)/parser.y
 
 
