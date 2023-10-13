@@ -17,48 +17,41 @@
 %token <sval> VAR
 %token EOL
 
-// %nterm <termval> sub_expr
-// %nterm <termval> app_expr
+%nterm <termval> sub_expr
+%nterm <termval> app_expr
 %nterm <termval> simple_expr
-%nterm <termval> abstraction
-%nterm <termval> application
-%nterm <termval> variable
-%nterm <termval> expression
 
 %%
 
-expression_list: %empty | expression_list expression EOL ;
-
-expression
-    : simple_expr { parser_read_expression($1); $$ = $1; }
-    | application { parser_read_expression($1); $$ = $1; }
+expression:
+    sub_expr EOL { parser_read_expression($1); }
+    | expression sub_expr EOL { parser_read_expression($2); }
     ;
 
-abstraction
-    : LAMBDA VAR DOT simple_expr {
+sub_expr:
+    LAMBDA VAR DOT sub_expr {
         Lterm* abs = lam_new_abs(lam_str($2), $4);
         $$ = abs;
     }
+    | app_expr { $$ = $1; }
     ;
 
-application
-    : expression simple_expr {
+app_expr:
+    simple_expr { $$ = $1; }
+    | app_expr simple_expr {
         Lterm* app = lam_new_app($1, $2);
         $$ = app;
     }
     ;
 
-variable
-    : VAR {
+simple_expr:
+    VAR {
         Lterm* var = lam_new_var(lam_str($1));
         $$ = var;
     }
-    ;
-
-simple_expr
-    : variable
-    | abstraction
-    | LPAREN expression RPAREN { $$ = $2; }
+    | LPAREN sub_expr RPAREN {
+        $$ = $2;
+    }
     ;
 
 %%
