@@ -23,12 +23,15 @@
 
 %%
 
+expression_list: expression | expression_list expression ;
+
 expression:
-    sub_expr EOL { parser_read_expression($1); }
+    EOL
+    | sub_expr EOL { parser_read_expression($1); }
     | expression sub_expr EOL { parser_read_expression($2); }
     ;
 
-sub_expr:
+sub_expr: 
     LAMBDA VAR DOT sub_expr {
         Lterm* abs = lam_new_abs(lam_str($2), $4);
         $$ = abs;

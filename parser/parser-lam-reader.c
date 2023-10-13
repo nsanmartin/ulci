@@ -9,7 +9,6 @@ Lterm* _last_lterm = 0x0;
 
 int set_last_lam_term(Lterm t[static 1]) {
     lam_print_term(t);
-    puts("");
     _last_lterm = t;
     return 0;
 }
@@ -49,7 +48,7 @@ Lstr eval_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
 void read_eval_print_promt(const Lterm t[static 1]) {
     Lterm* v = lam_eval(t);
     lam_print_term_less_paren(v);
-    puts("\n> ");
+    puts("");
 }
 
 //todo: choose the funtion with a cli param
