@@ -17,39 +17,39 @@
 %token <sval> VAR
 %token EOL
 
-%nterm <termval> sub_expr
-%nterm <termval> app_expr
-%nterm <termval> simple_expr
+%nterm <termval> expression
+%nterm <termval> not_lambda
+%nterm <termval> neither_lambda_nor_app
 
 %%
 
-expression:
-    sub_expr EOL { parser_read_expression($1); }
-    | expression sub_expr EOL { parser_read_expression($2); }
+expression_list
+    : expression EOL { parser_read_expression($1); }
+    | expression_list expression EOL { parser_read_expression($2); }
     ;
 
-sub_expr:
-    LAMBDA VAR DOT sub_expr {
+expression
+    : LAMBDA VAR DOT expression {
         Lterm* abs = lam_new_abs(lam_str($2), $4);
         $$ = abs;
     }
-    | app_expr { $$ = $1; }
+    | not_lambda { $$ = $1; }
     ;
 
-app_expr:
-    simple_expr { $$ = $1; }
-    | app_expr simple_expr {
+not_lambda
+    : neither_lambda_nor_app { $$ = $1; }
+    | not_lambda neither_lambda_nor_app {
         Lterm* app = lam_new_app($1, $2);
         $$ = app;
     }
     ;
 
-simple_expr:
-    VAR {
+neither_lambda_nor_app
+    : VAR {
         Lterm* var = lam_new_var(lam_str($1));
         $$ = var;
     }
-    | LPAREN sub_expr RPAREN {
+    | LPAREN expression RPAREN {
         $$ = $2;
     }
     ;
