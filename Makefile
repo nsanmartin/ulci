@@ -26,9 +26,10 @@ FLEX_OBJ=$(BUILD)/lex.yy.o
 BISON_SRC=$(BUILD)/parser.tab.c
 BISON_OBJ=$(BUILD)/parser.tab.o
 FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
-PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c
+PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c $(PARSER_DIR)/parser-names.c
+#PARSER_UTIL=$(wildcard $(PARSER_DIR)/*.c)
 
-
+all: build/parser run-tests
 
 run-tests: $(BUILD)/utests $(BUILD)/itests
 	$(BUILD)/utests
@@ -44,8 +45,10 @@ $(BUILD)/itests: itests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_
 $(LAM_OBJDIR)/%.o: $(LAM_SRCDIR)/%.c $(LAM_HEADERS)
 	$(CC) $(LAMF) $(STRICT_CFLAGS) $(CFLAGS) -c -o $@  $<
 
-$(BUILD)/parser: $(FLEXBISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
-	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) -o $@ $(PARSER_DIR)/parser.c $^ -lfl
+$(BUILD)/parser: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
+	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) \
+		-o $@ $(PARSER_DIR)/parser.c \
+		$^ -lfl
 
 
 $(GCOBJ):

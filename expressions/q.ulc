@@ -1,0 +1,5 @@
+let p = \f.f x
+x y
+p z
+p x y
+p (x y)

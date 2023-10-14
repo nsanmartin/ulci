@@ -1,0 +1,4 @@
+let id = \x.x
+x y
+id z
+id (x y)

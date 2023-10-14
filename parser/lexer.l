@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include "parser.tab.h"
+#include <parser-names.h>
 %}
 
 %option noyywrap
@@ -13,10 +14,17 @@
 "("                     { return LPAREN; }
 ")"                     { return RPAREN; }
 "\\"                    { return LAMBDA; }
+"="                     { return EQUALS; }
+"let"                   { return LET; }
 [a-zA-Z][a-zA-Z0-9_]*   {
     char* text = strdup(yytext);
     yylval.sval = text;
-    return VAR;
+    if (lam_name_is_defined(text)) {
+        //TODO: return NAME as term
+        return NAME;
+    } else {
+        return VAR;
+    }
 }
 [\n;]                    { return EOL; }
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "parser-lam-reader.h"
+#include <parser-names.h>
 
 int test_parse_impl(const char* s, const char* out, const char* expected) {
     if (strcmp(out, expected)) {
@@ -50,6 +51,10 @@ void test_eval_convention(const char* test, const char* expected) {
 }
 
 int main (void) {
+    if(initialize_symbol_table()) {
+        fprintf(stderr, "Error: not memory to initialize parser\n");
+        return -1;
+    }
     puts("Many parents");
     test_parse_all_paren("x (y z);", "(x (y z))");
     test_parse_all_paren("(x (y z));", "(x (y z))");
@@ -68,7 +73,15 @@ int main (void) {
         "\\f.(\\u.f(u u))(\\v.f(v v));",
         "(\\f.((\\u.(f (u u))) (\\v.(f (v v)))))"
     );
-
+    test_parse_all_paren(
+         "\\x.f x;", "(\\x.(f x))"
+    );
+    test_parse_all_paren(
+         "f(\\x.f x);", "(f (\\x.(f x)))"
+    );
+    test_parse_all_paren(
+         "\\f.(f(\\x.f x));", "(\\f.(f (\\x.(f x))))"
+    );
     puts("Less parents");
     test_parse_convention("x;", "x");
     test_parse_convention("x x;", "x x");
@@ -120,4 +133,49 @@ int main (void) {
     test_eval_convention( "(\\z.z x) ((\\x.x) (\\y.y));", "x");
     test_eval_convention( "(\\z.\\x. z) y;", "\\x.y");
     test_eval_convention( "(\\z.\\x. z) x;", "\\#.x");
+
+    puts("eval definitions");
+    test_eval_convention( "let id = \\x.x;", "\\x.x");
+    test_eval_convention( "id y;", "y");
+    // redefine id
+    test_eval_convention( "let id = \\y.y;", "\\y.y");
+    test_eval_convention( "id x x;", "x x");
+    test_eval_convention( "id id y;", "y");
+    test_eval_convention( "id (x y);", "x y");
+    test_eval_convention(
+        "let apply = \\f.f(\\x.(f x));", "\\f.f (\\x.f x)"
+    );
+    test_eval_convention( "apply id x;", "x");
+    test_eval_convention(
+        "let dup = \\f. f f; dup g;", "g g"
+    );
+    test_eval_convention(
+        "let const = a_const_name;(\\x.x) const;",
+        "a_const_name"
+    );
+    test_eval_convention("let true = \\x.\\y.x;", "\\x.\\y.x");
+    test_eval_convention("let false = \\x.\\y.y;", "\\x.\\y.y");
+    test_eval_convention(
+        "let ifelse = \\p.\\a.\\b.p a b;", "\\p.\\a.\\b.p a b"
+    );
+    test_eval_convention("ifelse true a b;", "a");
+    test_eval_convention("ifelse false a b;", "b");
+    test_eval_convention("let zero = \\f.\\x.x;", "\\f.\\x.x");
+    test_eval_convention(
+        "let succ = \\n.\\f.\\x.f(n f x);",
+       "\\n.\\f.\\x.f (n f x)"
+    );
+    test_eval_convention("let one = succ zero;", "\\f.\\x.f x");
+    test_eval_convention("let two = succ one;", "\\f.\\x.f (f x)");
+    test_eval_convention("let three = succ two;", "\\f.\\x.f (f (f x))");
+    test_eval_convention("let four = succ three;", "\\f.\\x.f (f (f (f x)))");
+    test_parse_convention(
+        "let plus = \\m.\\n.\\f.\\x.m f (n f x);",
+        "\\m.\\n.\\f.\\x.m f (n f x)"
+    );
+    //TODO:11.
+    //test_parse_convention("plus zero zero;",  "?");
+    //test_parse_convention("plus two one;",  "?");
+
 }
+
