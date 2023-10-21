@@ -173,9 +173,14 @@ int main (void) {
         "let plus = \\m.\\n.\\f.\\x.m f (n f x);",
         "\\m.\\n.\\f.\\x.m f (n f x)"
     );
-    //TODO:11.
-    //test_parse_convention("plus zero zero;",  "?");
-    //test_parse_convention("plus two one;",  "?");
+
+    test_eval_convention("plus zero zero;",  "\\f.\\x.x");
+    test_eval_convention("plus one one;", "\\f.\\x.f (f x)");
+    test_eval_convention("plus two one;",  "\\f.\\x.f (f (f x))");
+    test_eval_convention("plus one two;",  "\\f.\\x.f (f (f x))");
+    test_eval_convention("plus two two;", "\\f.\\x.f (f (f (f x)))");
+    test_eval_convention("plus three one;", "\\f.\\x.f (f (f (f x)))");
+    test_eval_convention("plus one three;", "\\f.\\x.f (f (f (f x)))");
 
 }
 
