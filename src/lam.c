@@ -18,17 +18,14 @@ Lstr lam_get_form_name(const Lterm t[static 1]) {
 }
 
 
-
 const char* lam_get_form_name_cstr(const Lterm t[static 1]) {
     return lam_get_form_name(t).s;
 }
 
 
-
 /**
  * Factory methods
  **/
-
 
 
 Lterm* lam_new_var(Lstr n) {
@@ -153,7 +150,6 @@ int lam_rename_var(Lterm t[static 1], Lstr varname, Lstr newname) {
 
 
 Lterm* lam_clone(const Lterm t[static 1]) {
-    //todo
     switch(t->tag) {
         case Lvartag: {return lam_new_var(t->var.name);}
         case Labstag: {return lam_new_abs(t->abs.vname, t->abs.body);}
@@ -383,23 +379,6 @@ Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
 
             size_t nparen = 0;
             const char* fmt = "%s %s";
-
-            // "%s %s":
-            // app var
-            // var var
-
-            // "(%s) (%s)"
-            // abs app
-
-            // "%s (%s)"
-            // var app
-            // var abs
-            // app abs
-            // app app
-
-            // "(%s) %s"
-            // abs abs
-            // abs var
 
             if (t->app.fun->tag != Labstag && t->app.param->tag == Lvartag) {
             } else if (t->app.fun->tag == Labstag && t->app.param->tag == Lapptag) {
