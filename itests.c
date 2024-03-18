@@ -135,42 +135,42 @@ int main (void) {
     test_eval_convention( "(\\z.\\x. z) x;", "\\#.x");
 
     puts("eval definitions");
-    test_eval_convention( "let id = \\x.x;", "\\x.x");
+    test_eval_convention( "set id = \\x.x", "\\x.x");
     test_eval_convention( "id y;", "y");
     // redefine id
-    test_eval_convention( "let id = \\y.y;", "\\y.y");
+    test_eval_convention( "set id = \\y.y;", "\\y.y");
     test_eval_convention( "id x x;", "x x");
     test_eval_convention( "id id y;", "y");
     test_eval_convention( "id (x y);", "x y");
     test_eval_convention(
-        "let apply = \\f.f(\\x.(f x));", "\\f.f (\\x.f x)"
+        "set apply = \\f.f(\\x.(f x));", "\\f.f (\\x.f x)"
     );
     test_eval_convention( "apply id x;", "x");
     test_eval_convention(
-        "let dup = \\f. f f; dup g;", "g g"
+        "set dup = \\f. f f; dup g;", "g g"
     );
     test_eval_convention(
-        "let const = a_const_name;(\\x.x) const;",
+        "set const = a_const_name;(\\x.x) const;",
         "a_const_name"
     );
-    test_eval_convention("let true = \\x.\\y.x;", "\\x.\\y.x");
-    test_eval_convention("let false = \\x.\\y.y;", "\\x.\\y.y");
+    test_eval_convention("set true = \\x.\\y.x;", "\\x.\\y.x");
+    test_eval_convention("set false = \\x.\\y.y;", "\\x.\\y.y");
     test_eval_convention(
-        "let ifelse = \\p.\\a.\\b.p a b;", "\\p.\\a.\\b.p a b"
+        "set ifelse = \\p.\\a.\\b.p a b;", "\\p.\\a.\\b.p a b"
     );
     test_eval_convention("ifelse true a b;", "a");
     test_eval_convention("ifelse false a b;", "b");
-    test_eval_convention("let zero = \\f.\\x.x;", "\\f.\\x.x");
+    test_eval_convention("set zero = \\f.\\x.x;", "\\f.\\x.x");
     test_eval_convention(
-        "let succ = \\n.\\f.\\x.f(n f x);",
+        "set succ = \\n.\\f.\\x.f(n f x);",
        "\\n.\\f.\\x.f (n f x)"
     );
-    test_eval_convention("let one = succ zero;", "\\f.\\x.f x");
-    test_eval_convention("let two = succ one;", "\\f.\\x.f (f x)");
-    test_eval_convention("let three = succ two;", "\\f.\\x.f (f (f x))");
-    test_eval_convention("let four = succ three;", "\\f.\\x.f (f (f (f x)))");
+    test_eval_convention("set one = succ zero;", "\\f.\\x.f x");
+    test_eval_convention("set two = succ one;", "\\f.\\x.f (f x)");
+    test_eval_convention("set three = succ two;", "\\f.\\x.f (f (f x))");
+    test_eval_convention("set four = succ three;", "\\f.\\x.f (f (f (f x)))");
     test_parse_convention(
-        "let plus = \\m.\\n.\\f.\\x.m f (n f x);",
+        "set plus = \\m.\\n.\\f.\\x.m f (n f x);",
         "\\m.\\n.\\f.\\x.m f (n f x)"
     );
 

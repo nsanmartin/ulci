@@ -48,7 +48,7 @@ $(LAM_OBJDIR)/%.o: $(LAM_SRCDIR)/%.c $(LAM_HEADERS)
 $(BUILD)/parser: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
 	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) \
 		-o $@ $(PARSER_DIR)/parser.c \
-		$^ -lfl
+		$^ -lfl -lc -lreadline
 
 
 $(GCOBJ):
