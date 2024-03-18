@@ -17,7 +17,7 @@
 %token LAMBDA
 %token <sval> VAR
 %token <sval> NAME
-%token LET
+%token SET
 %token EQUALS
 %token EOL
 
@@ -31,20 +31,21 @@
 %%
 
 expression_list
-    : expression EOL { parser_read_expression($1); }
-    | expression_list expression EOL { parser_read_expression($2); }
-    | LET VAR EQUALS expression EOL {
+    : expression end { parser_read_expression($1); }
+    | expression_list expression end { parser_read_expression($2); }
+    | SET VAR EQUALS expression end {
         Lterm* t = $4;
         parser_read_expression(t);
         lam_name_insert($2, t);
     }
-    | LET NAME EQUALS expression EOL {
+    | SET NAME EQUALS expression end {
         Lterm* t = $4;
         parser_read_expression(t);
         lam_name_insert($2, t);
     }
     ;
 
+end : EOL | YYEOF ;
 expression
     : LAMBDA VAR DOT expression {
         Lterm* abs = lam_new_abs(lam_str($2), $4);

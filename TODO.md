@@ -5,6 +5,7 @@
 6. evaluation
 8. add tests to eval
 11. fix plus sample eval
+12. use readline (as submodule) for interactive interpreter
 
 # DONE
 4. move main outside parser.y

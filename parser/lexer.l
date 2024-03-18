@@ -15,7 +15,7 @@
 ")"                     { return RPAREN; }
 "\\"                    { return LAMBDA; }
 "="                     { return EQUALS; }
-"let"                   { return LET; }
+"set"                   { return SET; }
 [a-zA-Z][a-zA-Z0-9_]*   {
     char* text = strdup(yytext);
     yylval.sval = text;
