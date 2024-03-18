@@ -27,7 +27,7 @@ BISON_SRC=$(BUILD)/parser.tab.c
 BISON_OBJ=$(BUILD)/parser.tab.o
 FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
 PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c $(PARSER_DIR)/parser-names.c
-#PARSER_UTIL=$(wildcard $(PARSER_DIR)/*.c)
+PARSER_SRCS=$(wildcard $(PARSER_DIR)/*.c)
 
 all: build/parser run-tests
 
@@ -36,7 +36,7 @@ run-tests: $(BUILD)/utests $(BUILD)/itests
 	$(BUILD)/itests
 
 
-$(BUILD)/utests: utests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_UTIL) 
+$(BUILD)/utests: utests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_UTIL)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h  -I$(PARSER_INCLUDE) -o $@ $^ 
 
 $(BUILD)/itests: itests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_UTIL)

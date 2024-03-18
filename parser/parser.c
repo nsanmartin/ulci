@@ -6,6 +6,7 @@
 #include <parser-lam-reader.h>
 #include <parser-names.h>
 
+
 int interactive() {
     char* line = NULL;
     while ((line = readline("> "))) {;
@@ -13,11 +14,10 @@ int interactive() {
         if (line && *line) {
             add_history(line);
         }
-        //Lstr s = parse_string(line, lam_term_to_str_less_paren);
-        //printf("%s\n", s.s);
     }
     return 0;
 }
+
 
 int main (void) {
     parser_set_repl_fn();
