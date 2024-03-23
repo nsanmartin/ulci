@@ -10,6 +10,7 @@
 
 %%
 [ \t]                   { continue; }
+"#".*                   { continue; }
 "."                     { return DOT; }
 "("                     { return LPAREN; }
 ")"                     { return RPAREN; }

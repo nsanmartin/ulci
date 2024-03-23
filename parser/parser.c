@@ -19,17 +19,23 @@ int interactive() {
 }
 
 
-int main (void) {
+int main (int argc, char* argv[]) {
+    //yydebug = 1;
+
     parser_set_repl_fn();
     if(initialize_symbol_table()) {
         fprintf(stderr, "Erroe: not memory to initialize parser\n");
         return -1;
     }
 
-    if (isatty(fileno(stdin))) {
+    if (argc == 1) {
         interactive();
     } else {
-        yyin = stdin;
-        yyparse();
+        for (int i = 1; i < argc; ++i) {
+            yyin = fopen(argv[i], "r");
+            if (yyin) {
+                yyparse();
+            }
+        }
     }
 }

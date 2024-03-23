@@ -1,0 +1,7 @@
+x
+y
+\x.y
+set id = \x.x
+set f = \y.a y x
+set g = id f
+g a b c

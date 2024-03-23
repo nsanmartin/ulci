@@ -3,6 +3,7 @@
     #include <lam.h>
     #include <parser-lam-reader.h>
     #include <parser-names.h>
+    #define YYDEBUG 1
 }
 
 %union {
@@ -30,22 +31,18 @@
 
 %%
 
-expression_list
-    : expression end { parser_read_expression($1); }
-    | expression_list expression end { parser_read_expression($2); }
-    | SET VAR EQUALS expression end {
-        Lterm* t = $4;
-        parser_read_expression(t);
-        lam_name_insert($2, t);
-    }
-    | SET NAME EQUALS expression end {
-        Lterm* t = $4;
-        parser_read_expression(t);
-        lam_name_insert($2, t);
-    }
+statement_list
+    : statement_list statement
+    | %empty
     ;
-
-end : EOL | YYEOF ;
+statement
+    : SET VAR EQUALS expression end {
+        Lterm* t = $4;
+        parser_read_expression(t);
+        lam_name_insert($2, t);
+    }
+    | expression end { parser_read_expression($1); }
+    ;
 expression
     : LAMBDA VAR DOT expression {
         Lterm* abs = lam_new_abs(lam_str($2), $4);
@@ -53,7 +50,7 @@ expression
     }
     | not_lambda { $$ = $1; }
     ;
-
+end : EOL | YYEOF ;
 not_lambda
     : neither_lambda_nor_app { $$ = $1; }
     | not_lambda neither_lambda_nor_app {

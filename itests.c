@@ -138,10 +138,10 @@ int main (void) {
     test_eval_convention( "set id = \\x.x", "\\x.x");
     test_eval_convention( "id y;", "y");
     // redefine id
-    test_eval_convention( "set id = \\y.y;", "\\y.y");
+    test_eval_convention( "set id2 = \\y.y;", "\\y.y");
     test_eval_convention( "id x x;", "x x");
-    test_eval_convention( "id id y;", "y");
-    test_eval_convention( "id (x y);", "x y");
+    test_eval_convention( "id2 id2 y;", "y");
+    test_eval_convention( "id2 (x y);", "x y");
     test_eval_convention(
         "set apply = \\f.f(\\x.(f x));", "\\f.f (\\x.f x)"
     );

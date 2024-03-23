@@ -1,0 +1,11 @@
+x;y;z
+y
+g a b c
+\x.y
+(\y.y w)
+(\y.y w) a
+((\y.y w) a)
+x
+\x.y
+y
+set id = \x.x
