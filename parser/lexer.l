@@ -15,8 +15,12 @@ const char* TokenNames[] = {
     [EOL] = "EOL\n",
     [SEMICOLON] = "SEMICOLON"
 };
+
+static bool last_was_end = false;
+
 static inline
-enum yytokentype id_tk(enum yytokentype t) {
+enum yytokentype id_token(enum yytokentype t) {
+    last_was_end = t == EOL || t == SEMICOLON;
     return t;
 }
 
@@ -26,8 +30,9 @@ enum yytokentype print_return(enum yytokentype t) {
     return t;
 }
 
-#define read_token(Tk) print_return(Tk)
+#define read_token(Tk) id_token(Tk)
 // #define read_token(Tk) return Tk
+
 %}
 
 %option noyywrap
@@ -36,8 +41,8 @@ enum yytokentype print_return(enum yytokentype t) {
 
 %%
 [ \t]                   { continue; }
-\n                      { return read_token(EOL); }
-";"                     { return read_token(SEMICOLON); }
+\n                      { if (!last_was_end) return read_token(EOL); }
+";"                     { if (!last_was_end) return read_token(SEMICOLON); }
 "#".*                   { continue; }
 "."                     { return read_token(DOT);}
 "("                     { return read_token(LPAREN);}

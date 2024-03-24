@@ -33,9 +33,8 @@
 %%
 
 statement_list
-    : end
-    | statement
-    | statement_list statement
+    : statement_list statement
+    | %empty
     ;
 statement
     : SET VAR EQUALS expression end {
