@@ -21,6 +21,7 @@
 %token SET
 %token EQUALS
 %token EOL
+%token SEMICOLON
 
 %nterm <termval> expression
 %nterm <termval> variable
@@ -32,8 +33,9 @@
 %%
 
 statement_list
-    : statement_list statement
-    | %empty
+    : end
+    | statement
+    | statement_list statement
     ;
 statement
     : SET VAR EQUALS expression end {
@@ -50,7 +52,7 @@ expression
     }
     | not_lambda { $$ = $1; }
     ;
-end : EOL | YYEOF ;
+end : SEMICOLON  | EOL | YYEOF ;
 not_lambda
     : neither_lambda_nor_app { $$ = $1; }
     | not_lambda neither_lambda_nor_app {

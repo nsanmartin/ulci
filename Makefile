@@ -29,7 +29,7 @@ FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
 PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c $(PARSER_DIR)/parser-names.c
 PARSER_SRCS=$(wildcard $(PARSER_DIR)/*.c)
 
-all: build/parser run-tests
+all: build/lexer build/parser run-tests
 
 run-tests: $(BUILD)/utests $(BUILD)/itests
 	$(BUILD)/utests
@@ -48,6 +48,11 @@ $(LAM_OBJDIR)/%.o: $(LAM_SRCDIR)/%.c $(LAM_HEADERS)
 $(BUILD)/parser: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
 	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) \
 		-o $@ $(PARSER_DIR)/parser.c \
+		$^ -lfl -lc -lreadline
+
+$(BUILD)/lexer: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
+	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) \
+		-o $@ $(PARSER_DIR)/lexer.c \
 		$^ -lfl -lc -lreadline
 
 
