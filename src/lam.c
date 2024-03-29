@@ -6,6 +6,9 @@
 #include "lam.h"
 #include "mem.h"
 
+#include <assert.h>
+
+
 long used_fresh_vars = 0;
 
 Lstr lam_get_form_name(const Lterm t[static 1]) {
@@ -149,7 +152,17 @@ int lam_rename_var(Lterm t[static 1], Lstr varname, Lstr newname) {
 
 
 
+unsigned lam_clone_counter = 0;
+
 Lterm* lam_clone(const Lterm t[static 1]) {
+    if (!t) {
+        puts("INVALID ARG");
+        exit(1);
+    }
+    if (lam_clone_counter % 1000 == 0) {
+        printf("lam couner: %d\n", lam_clone_counter);
+    }
+    lam_clone_counter++;
     switch(t->tag) {
         case Lvartag: {return lam_new_var(t->var.name);}
         case Labstag: {return lam_new_abs(t->abs.vname, t->abs.body);}
@@ -417,3 +430,4 @@ bool lam_normal_form(const Lterm t[static 1]) {
                 && lam_normal_form(t->app.param))
         ;
 }
+

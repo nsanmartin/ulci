@@ -47,7 +47,11 @@ Lstr eval_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
 
 void read_eval_print_promt(const Lterm t[static 1]) {
     Lterm* v = lam_eval(t);
-    lam_print_term_less_paren(v);
+    if (v) {
+        lam_print_term_less_paren(v);
+    } else {
+        printf("No parse");
+    }
     puts("");
 }
 

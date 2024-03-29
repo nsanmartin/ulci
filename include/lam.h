@@ -81,4 +81,7 @@ void lam_print_term(const Lterm t[static 1]) ;
 void lam_print_term_less_paren(const Lterm t[static 1]) ;
 
 bool lam_normal_form(const Lterm t[static 1]) ;
+inline static bool lam_valid_tag(const Lterm t[static 1]) {
+    return t->tag == Lvartag || t->tag == Labstag || t->tag == Lapptag;
+}
 #endif // __LAM_H_
