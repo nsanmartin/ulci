@@ -12,6 +12,13 @@ int initialize_symbol_table(void) {
     return stringTableInitWithSize(&_symbols, 100, 17);
 }
 
+bool lam_str_name_is_defined(Lstr name) {
+    if (_symbols.table) {
+        return stringTableContains(&_symbols, name);
+    }
+    return false;
+}
+
 bool lam_name_is_defined(const char* name) {
     if (_symbols.table) {
         return stringTableContains(&_symbols, lam_str(name));

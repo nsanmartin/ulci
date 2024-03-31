@@ -25,6 +25,7 @@ typedef struct {
 unsigned long hash(unsigned char *str);
 
 bool lam_name_is_defined(const char* name);
+bool lam_str_name_is_defined(Lstr name);
 
 int initialize_symbol_table(void);
 int lam_name_insert(const char* name, Lterm* t);
