@@ -5,22 +5,22 @@ unsigned lam_term_len(const Lterm* t) {
         case Lvartag: return 1;
         case Labstag: return 3 + lam_term_len(t->abs.body);
         case Lapptag: {
-            unsigned ldepth = lam_term_len(t->app.fun);
-            unsigned rdepth = lam_term_len(t->app.param);
-            return 2 + rdepth + ldepth;
+            unsigned llen = lam_term_len(t->app.fun);
+            unsigned rlen = lam_term_len(t->app.param);
+            return rlen + llen;
         }
         default: LOG_INVALID_LTERM_AND_EXIT ;
     }
 }
 
-unsigned lam_term_depth(const Lterm* t) {
+unsigned lam_term_height(const Lterm* t) {
     switch (t->tag) {
         case Lvartag: return 1;
-        case Labstag: return 1 + lam_term_depth(t->abs.body);
+        case Labstag: return 1 + lam_term_height(t->abs.body);
         case Lapptag: {
-            unsigned ldepth = lam_term_depth(t->app.fun);
-            unsigned rdepth = lam_term_depth(t->app.param);
-            return 1 + ldepth > rdepth ? ldepth : rdepth;
+            unsigned lheight = lam_term_height(t->app.fun);
+            unsigned rheight = lam_term_height(t->app.param);
+            return 1 + lheight > rheight ? lheight : rheight;
         }
         default: LOG_INVALID_LTERM_AND_EXIT ;
     }
