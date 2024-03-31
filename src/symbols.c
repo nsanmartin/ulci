@@ -1,5 +1,5 @@
 #include <mem.h>
-#include <parser-names.h>
+#include <lam-symbols.h>
 
 int stringTableInitWithSize(StringTable* st, size_t size, size_t max_tries);
 void stringTableSearch(StringTable* m, Lstr k, Result* res) ;

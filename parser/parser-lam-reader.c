@@ -32,6 +32,7 @@ Lstr parse_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
 }
 
 
+//read eval TODO:rename
 Lstr eval_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
     reset_last_lam_term();
     set_input_string(in);
@@ -45,13 +46,17 @@ Lstr eval_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
     return LamStr("Error: no parse");
 }
 
-void read_eval_print_promt(const Lterm t[static 1]) {
+void read_eval_print(const Lterm t[static 1]) {
     EvalCtx ctx = {.len0=lam_term_len(t)};
     const Lterm* v = lam_eval_with_ctx(t, &ctx);
-    if (v) {
-        lam_print_term_less_paren(v);
+    if (ctx.fail) {
+        printf("parse error: %s\nterm: '", ctx.msg);
+        lam_print_term_less_paren(t);
+        puts("'");
+    } else if (!v) {
+        printf("Lam internal error");
     } else {
-        printf("No parse: %s", ctx.msg);
+        lam_print_term_less_paren(v);
     }
     puts("");
 }
@@ -61,7 +66,7 @@ void (*_lam_print_term_fn)(const Lterm t[static 1]) = 0x0;//lam_print_term;
 //void (*_lam_print_term_fn)(const Lterm t[static 1]) = lam_print_term_less_paren;
 
 void parser_set_repl_fn(void) {
-    _lam_print_term_fn = read_eval_print_promt;
+    _lam_print_term_fn = read_eval_print;
 }
 /*
  * This function is used by the parser each time an expresion is read.

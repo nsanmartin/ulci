@@ -1,5 +1,5 @@
-#ifndef __LAM_PARSER_NAMES__
-#define __LAM_PARSER_NAMES__
+#ifndef __LAM_SYMBOLS__
+#define __LAM_SYMBOLS__
 
 #include <stdbool.h>
 #include <lam.h>

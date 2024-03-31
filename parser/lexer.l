@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include "parser.tab.h"
-#include <parser-names.h>
+#include <lam-symbols.h>
 
 const char* TokenNames[] = {
     [DOT] = "DOT",

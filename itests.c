@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 #include "parser-lam-reader.h"
-#include <parser-names.h>
+#include <lam-symbols.h>
 
 int test_parse_impl(const char* s, const char* out, const char* expected) {
     if (strcmp(out, expected)) {

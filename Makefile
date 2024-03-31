@@ -26,7 +26,7 @@ FLEX_OBJ=$(BUILD)/lex.yy.o
 BISON_SRC=$(BUILD)/parser.tab.c
 BISON_OBJ=$(BUILD)/parser.tab.o
 FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
-PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c $(PARSER_DIR)/parser-names.c
+PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c 
 PARSER_SRCS=$(wildcard $(PARSER_DIR)/*.c)
 
 all: build/lexer build/parser run-tests
@@ -66,10 +66,10 @@ $(BISON_SRC): $(PARSER_DIR)/parser.y
 	bison -Werror=all -Wcex -t -d -o $@ $<
 
 $(BISON_OBJ): $(BISON_SRC)
-	$(CC) -c -o $@ $^ -I$(LAM_INCLUDE) -I$(PARSER_INCLUDE)
+	$(CC) -g -Wall -c -o $@ $^ -I$(LAM_INCLUDE) -I$(PARSER_INCLUDE)
 
 $(FLEX_OBJ): $(FLEX_SRC)
-	$(CC) -c -o $@ $^ -I$(LAM_INCLUDE) -I$(PARSER_INCLUDE)
+	$(CC) -g -Wall -c -o $@ $^ -I$(LAM_INCLUDE) -I$(PARSER_INCLUDE)
 
 
 tags: $(LAM_HEADERS) $(LAM_SRCS) $(PARSER_DIR) utests.c itests.c

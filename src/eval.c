@@ -58,18 +58,20 @@ Lterm* lam_eval_(const Lterm t[static 1]) {
 
 const Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx* ctx) {
     if (!ctx) { return 0x0; }
+    if (ctx->fail) { return 0x0; }
     if (!t) { ctx->fail = true; return 0x0; }
-    if (lam_term_len(t) >= ctx->len0) {
+    if (lam_term_len(t) >= ctx->len0 && ctx->depth > 8) {
         ctx->msg = "term is not reducing.";
         ctx->fail = true;
         return t;
     }
 
-    if (ctx->depth > 1024) {
+    if (ctx->depth > 124000) {
         ctx->msg = "eval stack too large";
         ctx->fail = true;
-        return t;
+        return 0x0;
     }
+
     if (lam_normal_form(t)) { return lam_clone(t); }
     ctx->depth += 1;
 
