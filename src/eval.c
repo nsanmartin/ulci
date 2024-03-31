@@ -55,42 +55,37 @@ Lterm* lam_eval_(const Lterm t[static 1]) {
     }
 }
 
-typedef struct {
-    unsigned depth;
-    const char* m;
-} EvalCtx;
 
-void lam_print_ctx(const Lterm t[static 1], EvalCtx ctx[static 1]){
-    printf("%*c", ctx->depth, '>');
-    lam_print_term(t);
-}
+const Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx* ctx) {
+    if (!ctx) { return 0x0; }
+    if (!t) { ctx->fail = true; return 0x0; }
+    if (lam_term_len(t) >= ctx->len0) {
+        ctx->msg = "term is not reducing.";
+        ctx->fail = true;
+        return t;
+    }
 
-
-Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx ctx) {
-    if (!t) { return 0x0; }
-    if (ctx.depth > 1024) {
-        printf("eval stack too large, aborting.");
-        if (ctx.m) { printf("m: %s", ctx.m); }
-        puts("");
-        return 0x0;
+    if (ctx->depth > 1024) {
+        ctx->msg = "eval stack too large";
+        ctx->fail = true;
+        return t;
     }
     if (lam_normal_form(t)) { return lam_clone(t); }
-    ctx.depth += 1;
-    ctx.m = 0x0;
+    ctx->depth += 1;
 
     switch(t->tag) {
         // case Lvartag: return lam_clone(t); 
         case Labstag: {
-            Lterm* body = lam_eval_with_ctx(t->abs.body, ctx);
+            const Lterm* body = lam_eval_with_ctx(t->abs.body, ctx);
             if (!body) return 0x0;
             return lam_new_abs(t->abs.vname, body);
         }
         case Lapptag: {
-            Lterm* f = lam_eval_with_ctx(t->app.fun, ctx);
+            const Lterm* f = lam_eval_with_ctx(t->app.fun, ctx);
             if (!f) return 0x0;
-            Lterm* arg = lam_eval_with_ctx(t->app.param, ctx);
+            const Lterm* arg = lam_eval_with_ctx(t->app.param, ctx);
             if (!arg) return 0x0;
-            Lterm* r = lam_new_app(f, arg);
+            const Lterm* r = lam_new_app(f, arg);
             if (!r) { return 0x0; }
             if (r->app.fun->tag == Labstag) {
                 r = lam_eval_app(&r->app);
@@ -102,7 +97,7 @@ Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx ctx) {
 }
 
 Lterm* lam_eval(const Lterm t[static 1]) {
-    EvalCtx ctx = {0};
-    return lam_eval_with_ctx(t, ctx);
+    //TODO: use eval with ctx
+    return lam_eval_(t);
 }
 

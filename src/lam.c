@@ -36,7 +36,7 @@ Lterm* lam_new_var(Lstr n) {
     return rv;
 }
 
-Lterm* lam_new_abs(Lstr vn, Lterm body[static 1]) {
+Lterm* lam_new_abs(Lstr vn, const Lterm body[static 1]) {
     if (lam_str_null(vn)) { return 0x0; } 
     Lterm* b = lam_clone(body);
     if (!b) {  return 0x0; }
@@ -46,7 +46,7 @@ Lterm* lam_new_abs(Lstr vn, Lterm body[static 1]) {
     return rv;
 }
 
-Lterm* lam_new_app(Lterm fun[static 1], Lterm param[static 1]) {
+Lterm* lam_new_app(const Lterm fun[static 1], const Lterm param[static 1]) {
     Lterm* f = lam_clone(fun);
     if (!f) { return 0x0; }
     Lterm* p = lam_clone(param);

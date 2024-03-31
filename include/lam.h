@@ -57,8 +57,8 @@ Lstr lam_get_form_name(const Lterm t[static 1]) ;
 void lam_free_term(Lterm* t) ;
 Lterm* lam_clone(const Lterm t[static 1]) ;
 Lterm* lam_new_var(Lstr x) ;
-Lterm* lam_new_abs(Lstr x, Lterm body[static 1]) ;
-Lterm* lam_new_app(Lterm fun[static 1], Lterm param[static 1]) ;
+Lterm* lam_new_abs(Lstr x, const Lterm body[static 1]) ;
+Lterm* lam_new_app(const Lterm fun[static 1], const Lterm param[static 1]) ;
 
 int lam_init_var(Lterm t[static 1], Lstr x) ;
 int lam_init_abs(Lterm t[static 1], Lstr x, Lterm body[static 1]) ;
