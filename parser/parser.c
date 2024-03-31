@@ -9,7 +9,7 @@
 
 int interactive() {
     char* line = NULL;
-    while ((line = readline("> "))) {;
+    while ((line = readline("> "))) {
         parse_string(line, lam_term_to_str_less_paren);
         if (line && *line) {
             add_history(line);
