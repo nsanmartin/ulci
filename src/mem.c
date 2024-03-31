@@ -34,3 +34,10 @@ void lam_free_mem(void) {
     }
 #endif
 }
+
+char* lam_strdup(const char* s) {
+    //TODO: TESTMEM?
+    return GC_strdup(s);
+}
+
+

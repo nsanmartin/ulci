@@ -51,7 +51,7 @@ enum yytokentype print_return(enum yytokentype t) {
 "="                     { return read_token(EQUALS);}
 "set"                   { return read_token(SET);}
 [a-zA-Z][a-zA-Z0-9_]*   {
-    char* text = strdup(yytext);
+    char* text = lam_strdup(yytext);
     yylval.sval = text;
     if (lam_name_is_defined(text)) {
         //TODO: return NAME as term
