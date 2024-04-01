@@ -7,26 +7,6 @@
 #include <lam-symbols.h>
 #include <recursive-descent.h>
 
-//void parse_eol() {
-//    LamTokenTag tk = LamTokenTagsLen;
-//    for(; tk != LEof;) {
-//        LamKeywordBuf buf = {0};
-//        tk = lam_scan_next(&buf);
-//        const char* n = lam_token_to_str(tk);
-//        if (n) {
-//            printf("%s ", n);
-//            if (tk == LVar) {
-//                fwrite("[", 1, 1, stdout);
-//                fwrite(buf.s, 1, buf.len, stdout);
-//                fwrite("] ", 1, 2, stdout);
-//            }
-//        } else {
-//            puts("ERROR ><M");
-//            exit(1);
-//        }
-//    }
-//    puts("");
-//}
 
 int interactive_interpreter() {
     char* line = NULL;
@@ -45,11 +25,11 @@ int main (int argc, char* argv[]) {
     if (argc == 1) {
         interactive_interpreter();
     } else {
-        for (int i = 0; i < argc; ++i) {
+        for (int i = 1; i < argc; ++i) {
             FILE* fp = fopen(argv[i], "r");
             if (fp) {
                 lam_scan_set_file_input(fp);
-                //scan_eol();
+                lam_parse_stmts();
             } else {
                 printf("Could not read %s\n", argv[i]);
             }

@@ -5,6 +5,8 @@
 typedef struct {
     LamKeywordBuf buf;
     bool fail;
+    LamTokenTag last;
+    bool unget;
 } RecDescCtx;
 
 void lam_parse_stmts() ;

@@ -46,7 +46,7 @@ int main (int argc, char* argv[]) {
         //printf("> ");
         interactive_lexer();
     } else {
-        for (int i = 0; i < argc; ++i) {
+        for (int i = 1; i < argc; ++i) {
             FILE* fp = fopen(argv[i], "r");
             if (fp) {
                 lam_scan_set_file_input(fp);
