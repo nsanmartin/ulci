@@ -26,6 +26,6 @@ typedef enum {
 LamTokenTag lam_scan_next(LamKeywordBuf buf[static 1]);
 
 const char* lam_token_to_str(LamTokenTag tk);
-void lam_scan_set_fileinput(FILE* fp);
+void lam_scan_set_file_input(FILE* fp);
 void lam_scan_set_str_input(const char* buf);
 #endif

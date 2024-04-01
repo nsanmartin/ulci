@@ -15,6 +15,14 @@ const Lterm* lam_rec_descent(RecDescCtx* ctx) {
 
 const Lterm* lam_parse_expression(RecDescCtx* ctx) {
     if (!ctx) return 0x0;
+    LamTokenTag tk = lam_scan_next(&ctx->buf);
+    if (tk == LLambda) {
+        puts("lambda");
+    } else if (tk == LLparen) {
+        puts("lparen");
+    } else if (tk == LVar) {
+        return lam_new_var(lam_str(ctx->buf.s));
+    }
     return NotParseTerm;
 }
 
@@ -33,22 +41,30 @@ typedef struct {
 
 } LStmt;
 
-LStmt lam_parse_stmt(RecDescCtx* ctx) {
+LStmt lam_parse_set_stmt(RecDescCtx* ctx) {
     LStmt rv = {.tag=LNotParseTag};
-    
     LamTokenTag tk = lam_scan_next(&ctx->buf);
-    if (tk == LSet) {
-        tk = lam_scan_next(&ctx->buf);
-        if (tk != LVar) { return rv; }
-        tk = lam_scan_next(&ctx->buf);
-        if (tk != LEquals) { return rv; }
-        const Lterm* expr = lam_parse_expression(ctx);
-        if (expr == NotParseTerm) { return rv; }
-        tk = lam_scan_next(&ctx->buf);
-        if (!lam_stmt_is_end(tk)) { return rv; }
-        rv.expr = expr;
-        return rv;
-    }
-    //TODO: parse expression
+    if (tk != LVar) { return rv; }
+    tk = lam_scan_next(&ctx->buf);
+    if (tk != LEquals) { return rv; }
+    const Lterm* expr = lam_parse_expression(ctx);
+    if (expr == NotParseTerm) { return rv; }
+    tk = lam_scan_next(&ctx->buf);
+    if (!lam_stmt_is_end(tk)) { return rv; }
+    rv.expr = expr;
     return rv;
+}
+
+void lam_parse_stmts() {
+    RecDescCtx ctx = {0};
+    LStmt stmt = {.tag=LNotParseTag};
+
+    LamTokenTag tk = lam_scan_next(&ctx.buf);
+    if (tk == LEof) { return; }
+    if (tk == LSet) {
+        stmt = lam_parse_set_stmt(&ctx);
+    } else {
+        stmt = (LStmt) {.expr=lam_parse_expression(&ctx), .tag=LExprTag};
+    }
+    lam_print_term_less_paren(stmt.expr);
 }

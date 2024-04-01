@@ -6,4 +6,6 @@ typedef struct {
     LamKeywordBuf buf;
     bool fail;
 } RecDescCtx;
+
+void lam_parse_stmts() ;
 #endif

@@ -64,7 +64,7 @@ int lam_ungetc_file(char c) { return ungetc(c, _lam_scan_file); }
 char (*_lam_getc)(void) = lam_getc_str;
 int (*_lam_ungetc)(char c) = lam_ungetc_str;
 
-void lam_scan_set_fileinput(FILE* fp) {
+void lam_scan_set_file_input(FILE* fp) {
     _lam_scan_file = fp;
     _lam_getc = lam_getc_file;
     _lam_ungetc = lam_ungetc_file;
@@ -100,6 +100,7 @@ LamTokenTag lam_scan_next(LamKeywordBuf buf[static 1]) {
     if (!isalpha(c) && c != '_') {
         return LError;
     }
+    buf->len = 0;
     for (;;) {
         buf->s[buf->len++] = c;
         c = _lam_getc();

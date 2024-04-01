@@ -49,7 +49,7 @@ int main (int argc, char* argv[]) {
         for (int i = 0; i < argc; ++i) {
             FILE* fp = fopen(argv[i], "r");
             if (fp) {
-                lam_scan_set_fileinput(fp);
+                lam_scan_set_file_input(fp);
                 scan_eol();
             } else {
                 printf("Could not read %s\n", argv[i]);
