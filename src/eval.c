@@ -57,20 +57,12 @@ Lterm* lam_eval_(const Lterm t[static 1]) {
 
 
 const Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx* ctx) {
-    if (!ctx) { return 0x0; }
-    if (ctx->fail) { return 0x0; }
-    if (!t) { ctx->fail = true; return 0x0; }
+    if (!ctx) { return LamInternalError; }
+    if (lam_eval_error(t)) { return t; }
     if (lam_term_len(t) >= ctx->len0 && ctx->depth > 8) {
-        ctx->msg = "term is not reducing.";
-        ctx->fail = true;
-        return t;
+        return NotReducing;
     }
-
-    if (ctx->depth > 124000) {
-        ctx->msg = "eval stack too large";
-        ctx->fail = true;
-        return 0x0;
-    }
+    if (ctx->depth > 124000) { return EvalStackTooLarge; }
 
     if (lam_normal_form(t)) { return lam_clone(t); }
     ctx->depth += 1;
@@ -103,3 +95,42 @@ Lterm* lam_eval(const Lterm t[static 1]) {
     return lam_eval_(t);
 }
 
+////
+//// StmtReadCallbacks:
+///
+
+void eval_print(const Lterm t[static 1], void* ignore) {
+    (void) ignore;
+    EvalCtx ctx = {.len0=lam_term_len(t)};
+    const Lterm* v = lam_eval_with_ctx(t, &ctx);
+    if (t == NotReducing) {
+        printf("eval error: %s\nterm: '", "term is not reducing");
+        lam_print_term_less_paren(t);
+        puts("'");
+    } else if (t == EvalStackTooLarge) {
+        printf("eval error: %s\nterm: '", "eval stack too large");
+        lam_print_term_less_paren(t);
+        puts("'");
+    } else if (!t || t == LamInternalError) {
+        puts("Lam eval internal error");
+    } else {
+        lam_print_term_less_paren(v);
+    }
+    puts("");
+}
+
+void eval_to_list(const Lterm t[static 1], void* acum) {
+    EvalCtx ctx = {.len0=lam_term_len(t)};
+    const Lterm* v = lam_eval_with_ctx(t, &ctx);
+    if (acum) {
+        LtermList* ls = (LtermList*)acum;
+        ls->next = lam_malloc(sizeof(LtermList));
+        if (!ls->next) { puts("mem error"); exit(EXIT_FAILURE); }
+        ls->next->t = v;
+    } else {
+        puts("eval to list error"); exit(EXIT_FAILURE);
+    }
+}
+
+/*
+ * StmtReadCallbacks */

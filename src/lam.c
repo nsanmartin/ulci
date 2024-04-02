@@ -6,6 +6,23 @@
 #include "lam.h"
 #include "mem.h"
 
+
+//// Lterm values that denote errors:
+///
+const Lterm* LamInternalError = &(Lterm){
+    .var={.name={.s="LamInternalError"}}
+};
+// parse error
+const Lterm* NotParse = &(Lterm){.var={.name={.s="NotParse"}}};
+const Lterm* SyntaxError = &(Lterm){.var={.name={.s="SyntaxError"}}};
+// eval errors
+const Lterm* NotReducing = &(Lterm){.var={.name={.s="NotReducing"}}};
+const Lterm* EvalStackTooLarge = &(Lterm){
+    .var={.name={.s="EvalStackTooLarge"}}
+};
+////
+
+
 long used_fresh_vars = 0;
 
 Lstr lam_get_form_name(const Lterm t[static 1]) {

@@ -43,6 +43,29 @@ typedef struct Lterm {
     }; //term;
 } Lterm;
 
+// Lterm errors
+extern const Lterm* LamInternalError;
+// parse errors
+extern const Lterm* NotParse;
+extern const Lterm* SyntaxError;
+// eval errors
+extern const Lterm* NotReducing;
+extern const Lterm* EvalStackTooLarge;
+////
+static inline bool lam_invalid_term(const Lterm* t) {
+    return !t
+        || t == LamInternalError
+        || t == NotParse
+        || t == SyntaxError
+        || t == NotReducing
+        || t == EvalStackTooLarge;
+}
+
+static inline bool lam_eval_error(const Lterm* t) {
+    return !t || t == LamInternalError || t == EvalStackTooLarge
+        || t == NotReducing;
+}
+
 #define LVAR(NAME)                                                      \
     (Lterm){ .tag=Lvartag, .var=(Lvar){.name=NAME}} 
 

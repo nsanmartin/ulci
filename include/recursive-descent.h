@@ -9,5 +9,9 @@ typedef struct {
     bool unget;
 } RecDescCtx;
 
-void lam_parse_stmts() ;
+typedef struct {
+    void (*callback)(const Lterm[static 1], void*);
+    void* acum;
+} StmtReadCallback;
+void lam_parse_stmts(StmtReadCallback* on_stmt_read) ;
 #endif

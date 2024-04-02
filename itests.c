@@ -182,5 +182,10 @@ int main (void) {
     test_eval_convention("plus three one;", "\\f.\\x.f (f (f (f x)))");
     test_eval_convention("plus one three;", "\\f.\\x.f (f (f (f x)))");
 
+    puts("eval subst");
+    test_eval_convention("(\\x. x x) (\\x.x)",  "\\x.x");
+    test_eval_convention("((\\x.(x y)) (\\x.(x y)))", "y y");
+
+
 }
 

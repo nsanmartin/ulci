@@ -3,20 +3,7 @@
 #include <recursive-descent.h>
 
 const Lterm* lam_parse_expression(RecDescCtx* ctx) ;
-void eval_print(const Lterm t[static 1]) ;
 
-
-//// Lterm values that denote errors:
-///
-// An lam error that implies a bug and shold not happen
-const Lterm* LamInternalError = &(Lterm){
-    .var={.name={.s="LamInternalError"}}
-};
-// A parse that faild, but the parser should continiue trying other cases
-const Lterm* NotParse = &(Lterm){.var={.name={.s="NotParse"}}};
-// A snyntax error
-const Lterm* SyntaxError = &(Lterm){.var={.name={.s="SyntaxError"}}};
-////
 
 
 bool lam_parse_term_failed(const Lterm* t) {
@@ -154,7 +141,7 @@ const Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     return expr;
 }
 
-void lam_parse_stmts() {
+void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
     for (;;) {
         RecDescCtx ctx = {0};
         if (lam_parse_tk_next_match_or_unget(&ctx, LEof)) { return; }
@@ -169,7 +156,7 @@ void lam_parse_stmts() {
             puts("lam internal error, aborting.");
             exit(EXIT_FAILURE);
         } else if (set_stmt != NotParse) {
-            eval_print(set_stmt);
+            on_stmt_read->callback(set_stmt, on_stmt_read->acum);
             continue;
         }
 
@@ -185,25 +172,8 @@ void lam_parse_stmts() {
         } else if (!lam_parse_tk_next_is_end(&ctx)) {
             puts("Error parsing expression");
         } else {
-            eval_print(t);
+            on_stmt_read->callback(t, on_stmt_read->acum);
         }
     }
 }
 
-
-void eval_print(const Lterm t[static 1]) {
-    EvalCtx ctx = {.len0=lam_term_len(t)};
-    const Lterm* v = lam_eval_with_ctx(t, &ctx);
-    if (ctx.fail) {
-        printf("eval error: %s\nterm: '", ctx.msg);
-        lam_print_term_less_paren(t);
-        puts("'");
-    } else if (!v) {
-        printf("Lam eval internal error");
-    } else {
-        lam_print_term(t);
-        printf(" => ");
-        lam_print_term_less_paren(v);
-    }
-    puts("");
-}
