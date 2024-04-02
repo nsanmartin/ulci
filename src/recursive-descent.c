@@ -162,9 +162,12 @@ void lam_parse_stmts() {
         lam_parse_tk_unget(&ctx);
 
         const Lterm* set_stmt = lam_parse_stmt_set(&ctx);
-        if (lam_parse_error(set_stmt)) {
-            puts("Error parsing expression");
+        if (set_stmt == SyntaxError) {
+            puts("syntax error");
             continue;
+        } else if (!set_stmt || set_stmt == LamInternalError) {
+            puts("lam internal error, aborting.");
+            exit(EXIT_FAILURE);
         } else if (set_stmt != NotParse) {
             eval_print(set_stmt);
             continue;
@@ -172,8 +175,11 @@ void lam_parse_stmts() {
 
 
         const Lterm* t = lam_parse_expression(&ctx);
-        if (lam_parse_error(set_stmt)) {
-            puts("Error parsing expression");
+        if (t == SyntaxError) {
+            puts("syntax error");
+        } else if (!t || t == LamInternalError) {
+            puts("lam internal error, aborting.");
+            exit(EXIT_FAILURE);
         } else if (t == NotParse) {
             puts("lam internal error: should not happen?");
         } else if (!lam_parse_tk_next_is_end(&ctx)) {
@@ -193,8 +199,10 @@ void eval_print(const Lterm t[static 1]) {
         lam_print_term_less_paren(t);
         puts("'");
     } else if (!v) {
-        printf("Lam internal error");
+        printf("Lam eval internal error");
     } else {
+        lam_print_term(t);
+        printf(" => ");
         lam_print_term_less_paren(v);
     }
     puts("");
