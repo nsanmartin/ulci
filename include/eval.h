@@ -16,12 +16,16 @@ typedef struct {
 } EvalRes;
 
 
-struct LtermList_;
-typedef struct LtermList_ LtermList;
-struct LtermList_ {
+typedef struct LtermList {
     const Lterm* t;
-    LtermList* next;
-};
+    struct LtermList* next;
+} LtermList;
+
+
+typedef struct {
+    LtermList* first;
+    LtermList* last;
+} ToListCallbackAcum;
 
 Lterm* lam_eval(const Lterm t[static 1]) ;
 const Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx* ctx) ;

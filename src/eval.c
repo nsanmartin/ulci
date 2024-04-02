@@ -1,5 +1,6 @@
 #include <eval.h>
 
+
 unsigned lam_term_len(const Lterm* t) {
     switch (t->tag) {
         case Lvartag: return 1;
@@ -123,10 +124,20 @@ void eval_to_list(const Lterm t[static 1], void* acum) {
     EvalCtx ctx = {.len0=lam_term_len(t)};
     const Lterm* v = lam_eval_with_ctx(t, &ctx);
     if (acum) {
-        LtermList* ls = (LtermList*)acum;
-        ls->next = lam_malloc(sizeof(LtermList));
-        if (!ls->next) { puts("mem error"); exit(EXIT_FAILURE); }
-        ls->next->t = v;
+
+        LtermList* node = lam_malloc(sizeof(LtermList));
+        if (!node) { puts("lam malloc error"); exit(EXIT_FAILURE); }
+        *node = (LtermList){ .next=NULL,.t=v };
+
+        ToListCallbackAcum* a = acum; 
+        if (!a->first) {
+            // base case
+            a->first = node;
+            a->last = node;
+        } else {
+            a->last->next = node;
+            a->last = a->last->next;
+        }
     } else {
         puts("eval to list error"); exit(EXIT_FAILURE);
     }

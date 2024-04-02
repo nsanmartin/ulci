@@ -1,6 +1,8 @@
 #ifndef __LAM_LEXER_H_
 #define __LAM_LEXER_H_
 
+#include <stdio.h>
+
 enum { LamMaxKeywordLen = 256 };
 typedef struct {
     char s[LamMaxKeywordLen];

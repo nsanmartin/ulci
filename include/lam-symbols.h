@@ -2,7 +2,9 @@
 #define __LAM_SYMBOLS__
 
 #include <stdbool.h>
+
 #include <lam.h>
+
 
 typedef struct {
     unsigned int v;

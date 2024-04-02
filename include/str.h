@@ -3,6 +3,8 @@
 
 typedef struct { const char* s; size_t len; } Lstr;
 
+typedef struct LstrList { Lstr s; struct LstrList* next; } LstrList;
+
 static inline Lstr LEMPTY_STR() {
     return  (Lstr){.s="",.len=0};
 }

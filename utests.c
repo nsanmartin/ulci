@@ -6,6 +6,7 @@
 #include "utest.h"
 
 #include "lam.h"
+#include <test-util.h>
 
 #define X lam_str("x")
 #define Y lam_str("y")
@@ -328,4 +329,33 @@ UTEST(strcmp, lam_str_dup) {
     ASSERT_FALSE(lam_str_eq(lam_str("ab"), lam_str_dup(lam_str("a").s)));
     ASSERT_FALSE(lam_str_eq(lam_str(""), lam_str_dup(lam_str("aaaaaa").s)));
     ASSERT_FALSE(lam_str_eq(lam_str("bbb"), lam_str_dup(lam_str("aaa").s)));
+}
+
+UTEST(interpreter, t0) {
+    LtermList* r = stmts_str_to_evaluated_lst("x");
+    ASSERT_TRUE(r != NULL);
+    ASSERT_TRUE(r->next == NULL);
+    const Lterm* t = r->t;
+
+    if (lam_invalid_term(r->t)) {
+        puts("invalid term");
+        ASSERT_TRUE(false);
+    } else {
+        Lstr s = lam_term_to_str_less_paren(t);
+        ASSERT_TRUE(lam_str_eq(lam_str("x"), s));
+        ASSERT_FALSE(lam_str_eq(lam_str("%"), s));
+    }
+}
+
+UTEST(interpreter, t1) {
+    LtermList* rl = stmts_str_to_evaluated_lst(
+        "x;"
+        "y"
+    );
+    LstrList* sl = map_term_str(rl);
+    ASSERT_TRUE(sl != NULL);
+    ASSERT_TRUE(lam_str_eq(lam_str("x"), sl->s));
+    ASSERT_TRUE(sl->next != NULL);
+    ASSERT_TRUE(lam_str_eq(lam_str("y"), sl->next->s));
+    ASSERT_TRUE(sl->next->next == NULL);
 }
