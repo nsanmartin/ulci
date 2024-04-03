@@ -26,6 +26,12 @@ bool lam_name_is_defined(const char* name) {
     return false;
 }
 
+int lam_str_name_insert(Lstr name, Lterm* t) {
+    Result r;
+    stringTableInsert(&_symbols, name, t, &r);
+    return r.err;
+}
+
 int lam_name_insert(const char* name, Lterm* t) {
     Result r;
     stringTableInsert(&_symbols, lam_str(name), t, &r);

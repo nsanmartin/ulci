@@ -23,6 +23,10 @@ int interactive_interpreter(StmtReadCallback* callback) {
 
 int main (int argc, char* argv[]) {
     StmtReadCallback callback = { .callback=eval_print };
+    if(initialize_symbol_table()) {
+        fprintf(stderr, "Error: not memory to initialize parser\n");
+        return -1;
+    }
     if (argc == 1) {
         interactive_interpreter(&callback);
     } else {

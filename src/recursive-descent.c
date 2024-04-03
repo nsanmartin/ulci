@@ -1,6 +1,7 @@
 #include <lam.h>
 #include <eval.h>
 #include <recursive-descent.h>
+#include <lam-symbols.h>
 
 const Lterm* lam_parse_expression(RecDescCtx* ctx) ;
 
@@ -38,11 +39,10 @@ bool lam_parse_tk_next_is_end(RecDescCtx* ctx) {
 
 int lam_parse_tk_unget(RecDescCtx* ctx) {
     if (ctx->unget) {
-        puts("Should not undo twice, aborting");
-        exit(1);// should return error
+        puts("Lam internal error: should not unget twice, aborting");
+        exit(EXIT_FAILURE);// should return error instead?
     }
     ctx->unget = true;
-    //TODO: check usage
     return 0;
 }
 
@@ -81,8 +81,8 @@ const Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
     } else if (lam_parse_tk_next_match_or_unget(ctx, LVar)) {
         return lam_new_var(lam_parse_tk_dup_kw(ctx));//TODO!
     } else if (lam_parse_tk_next_match_or_unget(ctx, LName)) {
-        puts("nme");
-        return lam_new_var(lam_parse_tk_dup_kw(ctx));//TODO!
+        Lterm* t = lam_name_search(lam_parse_tk_dup_kw(ctx).s);
+        return t;
     }
     return NotParse;
 }
@@ -128,7 +128,7 @@ const Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     if (!lam_parse_tk_next_match_or_unget(ctx, LVar)) {
         return SyntaxError;
     }
-    //TODO: use this Lstr v = lam_parse_tk_dup_kw(ctx);
+    Lstr v = lam_parse_tk_dup_kw(ctx);
     if (!lam_parse_tk_next_match_or_unget(ctx, LEquals)) {
         return SyntaxError;
     }
@@ -138,6 +138,8 @@ const Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
         lam_parse_tk_unget(ctx);
         return SyntaxError;
     }
+    //TODO 0: use const?
+    lam_str_name_insert(v, (Lterm*)expr);
     return expr;
 }
 

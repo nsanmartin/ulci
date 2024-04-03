@@ -3,6 +3,7 @@
 2. add many itests
 8. add tests to eval
 13. add std lib (booleans, numbers, ...)
+14. Allow shadowing with paramters
 
 # DONE
 4. move main outside parser.y

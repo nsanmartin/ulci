@@ -1,4 +1,13 @@
 %code requires {
+
+/* 
+ * This is the grammar for bison. src/recursive-descendant.c contains
+ * the custom parser which I wrote because I was having an error I 
+ * was not able to debug easily evaluating some lambda terms.
+ * Unfortunately, I could not reproduce that bug in that grammar so I
+ * did not fix bison's one. Since, I am only using the custom one.
+*/
+
     #include <stdio.h>
     #include <lam.h>
     #include <parser-lam-reader.h>

@@ -1,6 +1,8 @@
 #ifndef __LAM_STR_H_
 #define __LAM_STR_H_
 
+#include <stdbool.h>
+
 typedef struct { const char* s; size_t len; } Lstr;
 
 typedef struct LstrList { Lstr s; struct LstrList* next; } LstrList;

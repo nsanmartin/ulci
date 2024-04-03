@@ -5,6 +5,8 @@
 #include <readline/history.h>
 
 #include <lexer.h>
+#include <str.h>
+#include <lam-symbols.h>
 //#include <parser-lam-reader.h>
 //#include <parser-names.h>
 
@@ -112,6 +114,9 @@ LamTokenTag lam_scan_next(LamKeywordBuf buf[static 1]) {
     
     if (buf->len == 3 && strncmp("set", buf->s, 3) == 0) {
         return LSet;
+    }
+    if (lam_str_name_is_defined(lam_strn(buf->s, buf->len))) {
+        return LName;
     }
     return LVar;
 }
