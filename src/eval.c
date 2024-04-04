@@ -102,20 +102,22 @@ Lterm* lam_eval(const Lterm t[static 1]) {
 
 void eval_print(const Lterm t[static 1], void* ignore) {
     (void) ignore;
+    void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
+
     EvalCtx ctx = {.len0=lam_term_len(t)};
     const Lterm* v = lam_eval_with_ctx(t, &ctx);
     if (t == NotReducing) {
         printf("eval error: %s\nterm: '", "term is not reducing");
-        lam_print_term_less_paren(t);
+        on_parse(t);
         puts("'");
     } else if (t == EvalStackTooLarge) {
         printf("eval error: %s\nterm: '", "eval stack too large");
-        lam_print_term_less_paren(t);
+        on_parse(t);
         puts("'");
     } else if (!t || t == LamInternalError) {
         puts("Lam eval internal error");
     } else {
-        lam_print_term_less_paren(v);
+        on_parse(v);
     }
     puts("");
 }

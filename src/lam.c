@@ -288,17 +288,21 @@ void lam_print_term_less_paren(const Lterm t[static 1]) {
             break;
         }
         case Labstag: {
-            printf("(\\%s.", lam_str_to_cstr(t->abs.vname));
+            printf("\\%s.", lam_str_to_cstr(t->abs.vname));
             lam_print_term_less_paren(t->abs.body);
-            printf(")");
+            //printf(")");
             break;
         }
         case Lapptag: {
-            //printf("(");
             lam_print_term_less_paren(t->app.fun);
             printf(" ");
-            lam_print_term_less_paren(t->app.param);
-            //printf(")");
+            if (t->app.param->tag == Lapptag || t->app.param->tag == Labstag) {
+                printf("(");
+                lam_print_term_less_paren(t->app.param);
+                printf(")");
+            } else {
+                lam_print_term_less_paren(t->app.param);
+            }
             break;
         }
         default: LOG_INVALID_LTERM_AND_EXIT ;
