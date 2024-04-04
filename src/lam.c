@@ -284,22 +284,23 @@ void lam_print_term(const Lterm t[static 1]) {
 void lam_print_term_less_paren(const Lterm t[static 1]) {
     switch(t->tag) {
         case Lvartag: {
-            printf("%s", lam_str_to_cstr(t->var.name));
+            lam_str_fwrite(t->var.name);
             break;
         }
         case Labstag: {
-            printf("\\%s.", lam_str_to_cstr(t->abs.vname));
+            fwrite("\\", 1, 1, stdout);
+            lam_str_fwrite(t->abs.vname);
+            fwrite(".", 1, 1, stdout);
             lam_print_term_less_paren(t->abs.body);
-            //printf(")");
             break;
         }
         case Lapptag: {
             lam_print_term_less_paren(t->app.fun);
-            printf(" ");
+            fwrite(" ", 1, 1, stdout);
             if (t->app.param->tag == Lapptag || t->app.param->tag == Labstag) {
-                printf("(");
+                fwrite("(", 1, 1, stdout);
                 lam_print_term_less_paren(t->app.param);
-                printf(")");
+                fwrite(")", 1, 1, stdout);
             } else {
                 lam_print_term_less_paren(t->app.param);
             }

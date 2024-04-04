@@ -7,6 +7,8 @@ typedef struct { const char* s; size_t len; } Lstr;
 
 typedef struct LstrList { Lstr s; struct LstrList* next; } LstrList;
 
+static inline void lam_str_fwrite(const Lstr s) { fwrite(s.s, 1, s.len, stdout); }
+
 static inline Lstr LEMPTY_STR() {
     return  (Lstr){.s="",.len=0};
 }
