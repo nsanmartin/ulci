@@ -11,7 +11,7 @@ void print_rand_expr(Termtag t) {
     switch (t) {
         case Exptag: {
             if (subcase) {
-                printf("\\%s.", "x");
+                printf("\\%c.", 's' + rand() % 8);
                 print_rand_expr(Exptag);
             } else {
                 print_rand_expr(Apptag);
