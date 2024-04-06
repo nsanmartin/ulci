@@ -75,6 +75,8 @@ static inline bool lam_eval_error(const Lterm* t) {
 #define LAPP(FUN, PARAM)                                                \
     (Lterm) {.tag=Lapptag, .app=(Lapp){.fun=&FUN,.param=&PARAM}}
 
+unsigned lam_term_len(const Lterm* t);
+unsigned lam_term_height(const Lterm* t);
 
 Lstr lam_get_form_name(const Lterm t[static 1]) ;
 void lam_free_term(Lterm* t) ;

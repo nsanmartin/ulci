@@ -40,6 +40,32 @@ const char* lam_get_form_name_cstr(const Lterm t[static 1]) {
 }
 
 
+unsigned lam_term_len(const Lterm* t) {
+    switch (t->tag) {
+        case Lvartag: return 1;
+        case Labstag: return 3 + lam_term_len(t->abs.body);
+        case Lapptag: {
+            unsigned llen = lam_term_len(t->app.fun);
+            unsigned rlen = lam_term_len(t->app.param);
+            return rlen + llen;
+        }
+        default: LOG_INVALID_LTERM_AND_EXIT ;
+    }
+}
+
+unsigned lam_term_height(const Lterm* t) {
+    switch (t->tag) {
+        case Lvartag: return 1;
+        case Labstag: return 1 + lam_term_height(t->abs.body);
+        case Lapptag: {
+            unsigned lheight = lam_term_height(t->app.fun);
+            unsigned rheight = lam_term_height(t->app.param);
+            return 1 + lheight > rheight ? lheight : rheight;
+        }
+        default: LOG_INVALID_LTERM_AND_EXIT ;
+    }
+}
+
 /**
  * Factory methods
  **/
@@ -130,6 +156,7 @@ Lstr lam_get_fresh_var_name(const Lterm t[static 1]) {
     if (!rv) { return lam_str(0x0); }
     memset(rv, var_reserved_char, len);
     rv[len] = '\0';
+    printf("fresh var: %s\n", rv);
     return lam_str(rv);
 }
 

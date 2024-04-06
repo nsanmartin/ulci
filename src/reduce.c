@@ -63,19 +63,18 @@ Lterm* lam_reduce_step(Lterm t[static 1]) {
                 t->app.fun = lam_reduce_step(t->app.fun);
                 return t;
             }
-            //if (t->app.fun->tag == Labstag) {
-            //    Labs* abs = &t->app.fun->abs;
-            //    return lam_red_subst(abs->body, abs->vname, t->app.param);
-            //} else {
-            //    if (lam_normal_form(t->app.fun)) {
-            //        return lam_reduce_step(t->app.param);
-            //    } else {
-            //        return lam_reduce_step(t->app.fun);
-            //    }
-            //}
         }
         default: return (Lterm*)LamInternalError;
     }
+}
+
+void lam_term_log(const Lterm* t, unsigned nreds) {
+    printf(
+        "len: %d, height: %d, nreds: %d\n",
+        lam_term_len(t),
+        lam_term_height(t),
+        nreds
+    );
 }
 
 Lterm* lam_reduce(Lterm* t) {
@@ -85,11 +84,7 @@ Lterm* lam_reduce(Lterm* t) {
         ; nreds < max_reductions && !lam_normal_form(t)
         ; ++nreds, t = lam_reduce_step(t)
     ) {
-        //if (nreds % 150 == 0) {
-        //    printf("red: ");
-        //    lam_print_term_less_paren(t);
-        //    puts("");
-        //}
+        lam_term_log(t, nreds);
     }
     if (nreds == max_reductions) {
         puts("too many reductions");

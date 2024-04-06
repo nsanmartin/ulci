@@ -1,32 +1,6 @@
 #include <eval.h>
 
 
-unsigned lam_term_len(const Lterm* t) {
-    switch (t->tag) {
-        case Lvartag: return 1;
-        case Labstag: return 3 + lam_term_len(t->abs.body);
-        case Lapptag: {
-            unsigned llen = lam_term_len(t->app.fun);
-            unsigned rlen = lam_term_len(t->app.param);
-            return rlen + llen;
-        }
-        default: LOG_INVALID_LTERM_AND_EXIT ;
-    }
-}
-
-unsigned lam_term_height(const Lterm* t) {
-    switch (t->tag) {
-        case Lvartag: return 1;
-        case Labstag: return 1 + lam_term_height(t->abs.body);
-        case Lapptag: {
-            unsigned lheight = lam_term_height(t->app.fun);
-            unsigned rheight = lam_term_height(t->app.param);
-            return 1 + lheight > rheight ? lheight : rheight;
-        }
-        default: LOG_INVALID_LTERM_AND_EXIT ;
-    }
-}
-
 Lterm* lam_eval_app(const Lapp app[static 1]) {
     Lstr x = app->fun->abs.vname;
     Lterm* body = app->fun->abs.body;
