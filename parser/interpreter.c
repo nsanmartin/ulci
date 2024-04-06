@@ -7,6 +7,29 @@
 #include <eval.h>
 #include <lam-symbols.h>
 #include <recursive-descent.h>
+#include <reduce.h>
+
+void reduce_print(Lterm t[static 1], void* ignore) {
+    (void) ignore;
+    void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
+
+    const Lterm* v = lam_reduce(t);
+    if (t == NotReducing) {
+        printf("eval error: %s\nterm: '", "term is not reducing");
+        on_parse(t);
+        puts("'");
+    } else if (t == EvalStackTooLarge) {
+        printf("eval error: %s\nterm: '", "eval stack too large");
+        on_parse(t);
+        puts("'");
+    } else if (!t || t == LamInternalError) {
+        puts("Lam eval internal error");
+    } else {
+        on_parse(v);
+    }
+    puts("");
+}
+
 
 int interactive_interpreter(StmtReadCallback* callback) {
     char* line = NULL;
@@ -22,7 +45,7 @@ int interactive_interpreter(StmtReadCallback* callback) {
 
 
 int main (int argc, char* argv[]) {
-    StmtReadCallback callback = { .callback=eval_print };
+    StmtReadCallback callback = { .callback=reduce_print };
     if(initialize_symbol_table()) {
         fprintf(stderr, "Error: not memory to initialize parser\n");
         return -1;

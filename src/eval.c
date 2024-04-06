@@ -36,15 +36,6 @@ Lterm* lam_eval_app(const Lapp app[static 1]) {
     return r;
 }
 
-Lterm* lam_eval_in_place_beta(const Lapp app[static 1]) {
-    Lstr x = app->fun->abs.vname;
-    Lterm* body = app->fun->abs.body;
-    Lterm* s = app->param;
-
-    Lterm* r = lam_substitute(body, x, s);
-    return r;
-}
-
 
 Lterm* lam_eval_(const Lterm t[static 1]) {
     if (lam_normal_form(t)) { return lam_clone(t); }
@@ -65,35 +56,6 @@ Lterm* lam_eval_(const Lterm t[static 1]) {
     }
 }
 
-
-Lterm* lam_eval_in_place_with_ctx(Lterm* t, EvalCtx* ctx) {
-    if (!ctx) { return (Lterm*)LamInternalError; }
-    if (lam_eval_error(t) || lam_normal_form(t)) { return t; }
-    if (lam_term_len(t) >= ctx->len0 && ctx->depth > 8) {
-        return (Lterm*)NotReducing;
-    }
-    if (ctx->depth > 124000) { return (Lterm*)EvalStackTooLarge; }
-    ctx->depth += 1;
-    switch(t->tag) {
-        // case Lvartag: return lam_clone(t); 
-        case Labstag: {
-            t->abs.body = lam_eval_in_place_with_ctx(t->abs.body, ctx);
-            return t;
-        }
-        case Lapptag: {
-            //lam_eval_in_place_beta(t);
-            Lstr x = t->app.fun->abs.vname;
-            Lterm* body = t->app.fun->abs.body;
-            Lterm* s = t->app.param;
-            body = lam_substitute_in_place(body, x, s);
-            //t->app.fun->abs.body = lam_substitute_in_place(body, x, s);
-            //t->app.fun = lam_eval_in_place_with_ctx(t->app.fun, ctx);
-            //t = lam_eval_in_place_with_ctx(t, ctx);
-            return body;
-        }
-        default: LOG_INVALID_LTERM_AND_EXIT ;
-    }
-}
 
 const Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx* ctx) {
     if (!ctx) { return LamInternalError; }
@@ -143,7 +105,7 @@ void eval_print(const Lterm t[static 1], void* ignore) {
     void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
 
     EvalCtx ctx = {.len0=lam_term_len(t)};
-    const Lterm* v = lam_eval_in_place_with_ctx((Lterm*)t, &ctx);
+    const Lterm* v = lam_eval_with_ctx(t, &ctx);
     if (t == NotReducing) {
         printf("eval error: %s\nterm: '", "term is not reducing");
         on_parse(t);
@@ -160,7 +122,7 @@ void eval_print(const Lterm t[static 1], void* ignore) {
     puts("");
 }
 
-void eval_to_list(const Lterm t[static 1], void* acum) {
+void eval_to_list(Lterm t[static 1], void* acum) {
     EvalCtx ctx = {.len0=lam_term_len(t)};
     const Lterm* v = lam_eval_with_ctx(t, &ctx);
     if (acum) {

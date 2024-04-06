@@ -180,59 +180,6 @@ Lterm* lam_clone(const Lterm t[static 1]) {
  */
 
 
-Lterm* lam_substitute_in_place(Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
-    switch(t->tag) {
-        case Lvartag: {
-            if (lam_str_eq(t->var.name, x)) { return s; }   // free s?
-            else { return t; }                              // free t?
-        }
-        case Labstag: {
-            if (lam_is_var_free_in(t,x)) {
-
-                //Lterm* u = (Lterm*)t;
-                if (lam_is_var_free_in(s, t->abs.vname)) {
-                    //u = lam_clone(u);
-                    //if (!u) { return 0x0; }
-                    Lstr fresh_name = lam_get_fresh_var_name(t);
-                    if (lam_str_null(fresh_name)) { return 0x0; }
-                    lam_rename_var(t->abs.body, t->abs.vname, fresh_name);
-					t->abs.vname = fresh_name;
-                }
-
-                t->abs.body = lam_substitute_in_place(t->abs.body, x, s);
-                if (!t->abs.body) { return 0x0; }
-                return t;
-                //Lstr vn = t->abs.vname;
-                //if (lam_str_null(vn)) { return 0x0; }
-                //Lterm* rv = lam_malloc(sizeof (*rv));
-                //if (!rv) { return 0x0; }
-                //*rv = (Lterm) {
-                //    .tag=Labstag,
-                //    .abs=(Labs) {.vname=vn, .body=subst}
-                //};
-                //return rv;
-            } else { //x is captured by \x
-                return t;
-            }
-        }
-        case Lapptag: {
-            t->app.fun = lam_substitute_in_place(t->app.fun, x, s);
-            if (!t->app.fun) { return 0x0; }
-            t->app.param = lam_substitute_in_place(t->app.param, x, s);
-            if (!t->app.param) {  return 0x0; }
-            return t;
-            //Lterm* rv = lam_malloc(sizeof(*rv));
-            //if (!rv) {  return 0x0; }
-            //*rv = (Lterm) {
-            //    .tag=Lapptag,
-            //    .app = (Lapp){ .fun=f_, .param=p_ }
-            //};
-            //return rv;
-        }
-        default: LOG_INVALID_LTERM_AND_EXIT ;
-    }
-}
-
 Lterm*
 lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
     switch(t->tag) {

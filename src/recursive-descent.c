@@ -158,7 +158,7 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
             puts("lam internal error, aborting.");
             exit(EXIT_FAILURE);
         } else if (set_stmt != NotParse) {
-            on_stmt_read->callback(set_stmt, on_stmt_read->acum);
+            on_stmt_read->callback((Lterm*)set_stmt, on_stmt_read->acum);
             continue;
         }
 
@@ -174,7 +174,7 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
         } else if (!lam_parse_tk_next_is_end(&ctx)) {
             puts("Error parsing expression");
         } else {
-            on_stmt_read->callback(t, on_stmt_read->acum);
+            on_stmt_read->callback((Lterm*)t, on_stmt_read->acum);
         }
     }
 }
