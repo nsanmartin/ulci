@@ -9,6 +9,11 @@
 #include <recursive-descent.h>
 #include <reduce.h>
 
+void free_term_callback(Lterm t[static 1], void* ignore) {
+    (void) ignore;
+    lam_free_term(t);
+}
+
 void reduce_print(Lterm t[static 1], void* ignore) {
     (void) ignore;
     void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
@@ -45,19 +50,23 @@ int interactive_interpreter(StmtReadCallback* callback) {
 
 
 int main (int argc, char* argv[]) {
-    StmtReadCallback callback = { .callback=reduce_print };
+    StmtReadCallback callback[3] = {
+        { .callback=reduce_print },
+        { .callback=free_term_callback },
+        {0}
+    };
     if(initialize_symbol_table()) {
         fprintf(stderr, "Error: not memory to initialize parser\n");
         return -1;
     }
     if (argc == 1) {
-        interactive_interpreter(&callback);
+        interactive_interpreter(callback);
     } else {
         for (int i = 1; i < argc; ++i) {
             FILE* fp = fopen(argv[i], "r");
             if (fp) {
                 lam_scan_set_file_input(fp);
-                lam_parse_stmts(&callback);
+                lam_parse_stmts(callback);
             } else {
                 printf("Could not read %s\n", argv[i]);
             }

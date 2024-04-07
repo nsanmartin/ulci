@@ -125,6 +125,7 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
         lam_parse_tk_unget(ctx);
         return (Lterm*)SyntaxError;
     }
+
     int err = lam_str_name_insert(v, (Lterm*)expr);
     if (err) {
         lam_free_term(expr);

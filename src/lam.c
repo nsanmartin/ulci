@@ -108,9 +108,13 @@ unsigned lam_term_height(const Lterm* t) {
 
 Lterm* lam_new_var(Lstr n) {
     if (lam_str_null(n)) { return 0x0; } 
+    Lstr m = lam_lstr_dup(n);
+    if (lam_str_null(m)) {
+        return 0x0;
+    }
     Lterm* rv = lam_malloc(sizeof (*rv));
     if (!rv) { return 0x0; }
-    *rv = (Lterm) { .tag=Lvartag, . var = (Lvar) { .name = n }};
+    *rv = (Lterm) { .tag=Lvartag, . var = (Lvar) { .name = m }};
     return rv;
 }
 

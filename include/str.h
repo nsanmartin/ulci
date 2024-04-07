@@ -19,7 +19,7 @@ static inline char* lam_str_to_cstr(Lstr s) {
     return (char*)s.s;
 }
 
-static inline Lstr lam_strn(const char* s, size_t len) {
+static inline Lstr lam_strn_view(const char* s, size_t len) {
     return (Lstr){.s=s, .len=len};
 }
 
@@ -29,6 +29,10 @@ static inline Lstr lam_str(const char* s) {
 
 static inline Lstr lam_strndup(const char* s, size_t n) {
     return (Lstr){.s=strndup(s,n), .len=n};
+}
+
+static inline Lstr lam_lstr_dup(Lstr s) {
+    return (Lstr){.s=strndup(s.s, s.len), .len=s.len};
 }
 
 static inline Lstr lam_str_dup(const char* s) {

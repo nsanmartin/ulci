@@ -43,4 +43,8 @@ static inline Lstr lam_parse_tk_dup_kw(RecDescCtx* ctx) {
     return lam_strndup(ctx->buf.s, ctx->buf.len);
 }
 
+static inline Lstr lam_parse_tk_kw_view(RecDescCtx* ctx) {
+    return lam_strndup(ctx->buf.s, ctx->buf.len);
+}
+
 #endif
