@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-enum { LamMaxKeywordLen = 256 };
+enum { LamMaxKeywordLen = 255 };
 typedef struct {
     char s[LamMaxKeywordLen];
     size_t len;

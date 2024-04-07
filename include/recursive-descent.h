@@ -17,6 +17,7 @@ typedef struct {
     void (*callback)(Lterm[static 1], void*);
     void* acum;
 } StmtReadCallback;
+
 void lam_parse_stmts(StmtReadCallback* on_stmt_read) ;
 
 static inline bool lam_parse_term_failed(const Lterm* t) {

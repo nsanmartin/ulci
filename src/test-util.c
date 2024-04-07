@@ -5,9 +5,12 @@
 
 LtermList* stmts_str_to_evaluated_lst(const char* s) {
     ToListCallbackAcum acum = {0};
-    StmtReadCallback callback = { .callback=eval_to_list, .acum=&acum };
+    StmtReadCallback callback[2] = {
+        { .callback=eval_to_list, .acum=&acum },
+        {0}
+    };
     lam_scan_set_str_input(s);
-    lam_parse_stmts(&callback);
+    lam_parse_stmts(callback);
     return acum.first;
 }
 
