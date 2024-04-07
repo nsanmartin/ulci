@@ -16,11 +16,6 @@ typedef struct {
 } EvalRes;
 
 
-typedef struct LtermList {
-    const Lterm* t;
-    struct LtermList* next;
-} LtermList;
-
 
 typedef struct {
     LtermList* first;

@@ -3,7 +3,7 @@
 #include <recursive-descent.h>
 #include <lam-symbols.h>
 
-const Lterm* lam_parse_expression(RecDescCtx* ctx) ;
+Lterm* lam_parse_expression(RecDescCtx* ctx) ;
 
 
 
@@ -69,78 +69,90 @@ Lstr lam_parse_tk_dup_kw(RecDescCtx* ctx) {
 /// Parser functions
 ///
 
-const Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
-    if (!ctx) return LamInternalError;
+Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
+    if (!ctx) return (Lterm*)LamInternalError;
     if (lam_parse_tk_next_match_or_unget(ctx, LLparen)) {
-        const Lterm* expr = lam_parse_expression(ctx);
-        if (lam_parse_term_failed(expr)) { return SyntaxError; }
+        Lterm* expr = lam_parse_expression(ctx);
+        if (lam_parse_term_failed(expr)) { return (Lterm*)SyntaxError; }
         if (lam_parse_tk_next_match_or_unget(ctx, LRparen)) {
             return expr; 
         }
-        return SyntaxError;
+        return (Lterm*)SyntaxError;
     } else if (lam_parse_tk_next_match_or_unget(ctx, LVar)) {
-        return lam_new_var(lam_parse_tk_dup_kw(ctx));//TODO!
+        return lam_var(lam_parse_tk_dup_kw(ctx));
     } else if (lam_parse_tk_next_match_or_unget(ctx, LName)) {
         Lterm* t = lam_name_search(lam_parse_tk_dup_kw(ctx).s);
-        return t;
+        return lam_clone(t);
     }
-    return NotParse;
+    return (Lterm*)NotParse;
 }
 
-const Lterm* lam_parse_not_lambda(RecDescCtx* ctx) {
-    if (!ctx) return LamInternalError;
-    const Lterm* app = lam_parse_neither_lnorapp(ctx);
-    if (lam_parse_term_failed(app)) { return SyntaxError; }
+Lterm* lam_parse_not_lambda(RecDescCtx* ctx) {
+    if (!ctx) return (Lterm*)LamInternalError;
+    Lterm* app = lam_parse_neither_lnorapp(ctx);
+    if (lam_parse_term_failed(app)) {
+        //lam_free_term(app); // if failed should have been freed already
+        return (Lterm*)SyntaxError;
+    }
     for(;;) {
-        const Lterm* p = lam_parse_neither_lnorapp(ctx);
+        Lterm* p = lam_parse_neither_lnorapp(ctx);
         if (p == NotParse) { break; }
         if (lam_parse_error(p)) { return p; }
-        app = lam_new_app(app, p);
+        app = lam_app(app, p);
     }
     return app;
 }
 
-const Lterm* lam_parse_lambda(RecDescCtx* ctx) {
-    if (!ctx) return LamInternalError;
+Lterm* lam_parse_lambda(RecDescCtx* ctx) {
+    if (!ctx) return (Lterm*)LamInternalError;
     if (!lam_parse_tk_next_match_or_unget(ctx, LLambda)) {
-        return NotParse;
+        return (Lterm*)NotParse;
     }
-    if (!lam_parse_tk_next_match(ctx, LVar)) { return SyntaxError; }
+    if (!lam_parse_tk_next_match(ctx, LVar)) { return (Lterm*)SyntaxError; }
     Lstr v = lam_parse_tk_dup_kw(ctx);
-    if (!lam_parse_tk_next_match(ctx, LDot)) { return SyntaxError; }
-    const Lterm* expr = lam_parse_expression(ctx);
-    if (lam_parse_term_failed(expr)) { return SyntaxError; }
-    return lam_new_abs(v, expr);
+    if (!lam_parse_tk_next_match(ctx, LDot)) {
+        lam_free((void*)v.s);
+        return (Lterm*)SyntaxError;
+    }
+    Lterm* expr = lam_parse_expression(ctx);
+    if (lam_parse_term_failed(expr)) {
+        lam_free((void*)v.s);
+        return (Lterm*)SyntaxError;
+    }
+    return lam_abs(v, expr);
+
 }
 
-const Lterm* lam_parse_expression(RecDescCtx* ctx) {
-    if (!ctx) return LamInternalError;
-    const Lterm* t =  lam_parse_lambda(ctx);
+Lterm* lam_parse_expression(RecDescCtx* ctx) {
+    if (!ctx) return (Lterm*)LamInternalError;
+    Lterm* t =  lam_parse_lambda(ctx);
     if (lam_parse_error(t)) { return t; }
     if (t != NotParse) { return t; }
     return lam_parse_not_lambda(ctx);
 }
 
 
-const Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
-    if (!ctx) return LamInternalError;
-    if (!lam_parse_tk_next_match_or_unget(ctx, LSet)) { return NotParse; }
+Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
+    if (!ctx) return (Lterm*)LamInternalError;
+    if (!lam_parse_tk_next_match_or_unget(ctx, LSet)) { return (Lterm*)NotParse; }
     if (!lam_parse_tk_next_match_or_unget(ctx, LVar)) {
-        return SyntaxError;
+        return (Lterm*)SyntaxError;
     }
     Lstr v = lam_parse_tk_dup_kw(ctx);
     if (!lam_parse_tk_next_match_or_unget(ctx, LEquals)) {
-        return SyntaxError;
+        return (Lterm*)SyntaxError;
     }
-    const Lterm* expr = lam_parse_expression(ctx);
-    if (lam_parse_term_failed(expr)) { return SyntaxError; }
+    Lterm* expr = lam_parse_expression(ctx);
+    if (lam_parse_term_failed(expr)) { return (Lterm*)SyntaxError; }
     if (!lam_parse_tk_next_is_end(ctx)) {
         lam_parse_tk_unget(ctx);
-        return SyntaxError;
+        return (Lterm*)SyntaxError;
     }
-    //TODO 0: use const?
-    lam_str_name_insert(v, (Lterm*)expr);
-    return expr;
+    int err = lam_str_name_insert(v, (Lterm*)expr);
+    if (err) {
+        lam_free_term(expr);
+    }
+    return lam_clone(expr);
 }
 
 void lam_parse_stmts(StmtReadCallback* on_stmt_read) {

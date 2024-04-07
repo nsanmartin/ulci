@@ -52,6 +52,16 @@ extern const Lterm* SyntaxError;
 extern const Lterm* NotReducing;
 extern const Lterm* EvalStackTooLarge;
 ////
+
+
+typedef struct LtermList {
+    const Lterm* t;
+    struct LtermList* next;
+} LtermList;
+
+
+void freeLtermList(LtermList* ls);
+
 static inline bool lam_invalid_term(const Lterm* t) {
     return !t
         || t == LamInternalError
@@ -77,6 +87,10 @@ static inline bool lam_eval_error(const Lterm* t) {
 
 unsigned lam_term_len(const Lterm* t);
 unsigned lam_term_height(const Lterm* t);
+
+Lterm* lam_var(Lstr n);
+Lterm* lam_abs(Lstr vn, Lterm body[static 1]);
+Lterm* lam_app(Lterm fun[static 1], Lterm param[static 1]);
 
 Lstr lam_get_form_name(const Lterm t[static 1]) ;
 void lam_free_term(Lterm* t) ;

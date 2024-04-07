@@ -358,4 +358,7 @@ UTEST(interpreter, t1) {
     ASSERT_TRUE(sl->next != NULL);
     ASSERT_TRUE(lam_str_eq(lam_str("y"), sl->next->s));
     ASSERT_TRUE(sl->next->next == NULL);
+
+    freeLstrList(sl);
+    freeLtermList(rl);
 }

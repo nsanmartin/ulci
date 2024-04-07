@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <gc/gc.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MEM_SZ 200
 void* lam_memory[MEM_SZ] = {0};
@@ -22,8 +23,12 @@ void* lam_malloc(size_t size) {
         abort();
     }
 #else
-    return GC_malloc(size);
+    return malloc(size);
 #endif
+}
+
+void lam_free(void* ptr) {
+    free(ptr);
 }
 
 void lam_free_mem(void) {
@@ -36,8 +41,7 @@ void lam_free_mem(void) {
 }
 
 char* lam_strdup(const char* s) {
-    //TODO: TESTMEM?
-    return GC_strdup(s);
+    return strdup(s);
 }
 
 

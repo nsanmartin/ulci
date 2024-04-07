@@ -12,6 +12,16 @@ int initialize_symbol_table(void) {
     return stringTableInitWithSize(&_symbols, 100, 17);
 }
 
+void freeSymbolTable(StringTable* t) {
+    if (t) {
+        for (unsigned long i = 0; i < t->size; ++i) {
+            Entry* e = t->table + i;
+            lam_free_term(e->t);
+            lam_free((void*)e->k.s);
+        }
+    }
+}
+
 bool lam_str_name_is_defined(Lstr name) {
     if (_symbols.table) {
         return stringTableContains(&_symbols, name);
