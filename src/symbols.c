@@ -1,8 +1,8 @@
 #include <mem.h>
 #include <lam-symbols.h>
 
-int stringTableInitWithSize(StringTable* st, size_t size, size_t max_tries);
-void stringTableSearch(StringTable* m, Lstr k, Result* res) ;
+int stringTableInitWithSize(StringTable st[static 1], size_t size, size_t max_tries);
+void stringTableSearch(StringTable m[static 1], Lstr k, Result res[static 1]) ;
 bool stringTableContains(StringTable* m, Lstr k);
 void stringTableInsert(StringTable* m, Lstr k, Lterm* t, Result* res);
 
@@ -67,8 +67,8 @@ unsigned long string_hash(const unsigned char *str) {
     return hash;
 }
 
-int stringTableInitWithSize(StringTable* st, size_t size, size_t max_tries) {
-    Entry* table = lam_malloc(size * (sizeof (Entry)));
+int stringTableInitWithSize(StringTable st[static 1], size_t size, size_t max_tries) {
+    Entry* table = calloc(size, sizeof (Entry));
     if (!table) {
         fprintf(stderr, "NOt memory to initialize table!");
         return -1;
@@ -79,7 +79,7 @@ int stringTableInitWithSize(StringTable* st, size_t size, size_t max_tries) {
     return 0;
 }
 
-void stringTableSearch(StringTable* m, Lstr k, Result* res) {
+void stringTableSearch(StringTable m[static 1], Lstr k, Result res[static 1]) {
     *res = (Result) { .ok=0x0, .err=true };
 
     if (k.len == 0 || k.s == NULL) {

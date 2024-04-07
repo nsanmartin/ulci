@@ -91,3 +91,8 @@ bison-no-warnings:
 	bison -t -d -o $(BISON_SRC) $(PARSER_DIR)/parser.y
 
 
+valgrind-foo:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter ~/ulci/foo
+
+valgrind-samples:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter ~/ulci/samples
