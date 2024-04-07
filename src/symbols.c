@@ -48,6 +48,15 @@ int lam_name_insert(const char* name, Lterm* t) {
     return r.err;
 }
 
+Lterm* lam_symbols_search_clone(Lstr name) {
+    if (_symbols.table) {
+        Result r;
+        stringTableSearch(&_symbols, name, &r);
+        return r.err ? 0x0 : lam_clone(((Entry*)r.ok)->t);
+    }
+    return 0x0;
+}
+
 Lterm* lam_name_search(const char* name) {
     if (_symbols.table) {
         Result r;

@@ -269,6 +269,7 @@ int lam_rename_var(Lterm t[static 1], Lstr varname, Lstr newname) {
 
 
 Lterm* lam_clone(const Lterm t[static 1]) {
+    if (lam_invalid_term(t)) { LOG_INVALID_LTERM_AND_EXIT ; }
     switch(t->tag) {
         case Lvartag: {return lam_new_var(t->var.name);}
         case Labstag: {return lam_new_abs(t->abs.vname, t->abs.body);}

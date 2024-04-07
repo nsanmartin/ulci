@@ -7,9 +7,6 @@
 #include <lexer.h>
 #include <str.h>
 #include <symbols.h>
-//#include <parser-lam-reader.h>
-//#include <parser-names.h>
-
 
 
 const char* LamTokenNames[] = {
@@ -43,6 +40,7 @@ char lam_getc_str(void) {
     }
     return '\0';
 }
+
 int lam_ungetc_str(char c) {
     if (c) {
         char d = _lam_scan_str_iter.buf[--_lam_scan_str_iter.ix];
@@ -103,7 +101,8 @@ LamTokenTag lam_scan_next(LamKeywordBuf buf[static 1]) {
         return LError;
     }
     buf->len = 0;
-    for (;;) {
+    for (;;++buf->len) {
+        //assert_keyword_len_is_valid(buf->len);
         buf->s[buf->len++] = c;
         c = _lam_getc();
         if (!isalnum(c) && c != '_') {

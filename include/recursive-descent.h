@@ -18,4 +18,28 @@ typedef struct {
     void* acum;
 } StmtReadCallback;
 void lam_parse_stmts(StmtReadCallback* on_stmt_read) ;
+
+static inline bool lam_parse_term_failed(const Lterm* t) {
+    return !t
+        || t == NotParse
+        || t == SyntaxError
+        || t == LamInternalError;
+}
+
+static inline bool lam_parse_error(const Lterm* t) {
+    return !t || t == SyntaxError || t == LamInternalError;
+}
+
+static inline bool lam_parse_tk_match(RecDescCtx* ctx, LamTokenTag t) {
+    return ctx->last == t;
+}
+
+static inline bool lam_stmt_is_end(LamTokenTag t) {
+    return t == LEof || t == LEol || t == LSemicolon;
+}
+
+static inline Lstr lam_parse_tk_dup_kw(RecDescCtx* ctx) {
+    return lam_strndup(ctx->buf.s, ctx->buf.len);
+}
+
 #endif

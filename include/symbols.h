@@ -33,5 +33,6 @@ int initialize_symbol_table(void);
 int lam_name_insert(const char* name, Lterm* t);
 int lam_str_name_insert(Lstr name, Lterm* t) ;
 Lterm* lam_name_search(const char* name);
+Lterm* lam_symbols_search_clone(Lstr name);
 
 #endif

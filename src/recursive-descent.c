@@ -6,30 +6,12 @@
 Lterm* lam_parse_expression(RecDescCtx* ctx) ;
 
 
-
-bool lam_parse_term_failed(const Lterm* t) {
-    return !t || t == NotParse || t == SyntaxError
-        || t == LamInternalError;
-}
-
-bool lam_parse_error(const Lterm* t) {
-    return !t || t == SyntaxError || t == LamInternalError;
-}
-
-bool lam_parse_tk_match(RecDescCtx* ctx, LamTokenTag t) {
-    return ctx->last == t;
-}
-
 LamTokenTag lam_parse_tk_next(RecDescCtx* ctx) {
     if (!ctx->unget) {
         ctx->last = lam_scan_next(&ctx->buf);
     }
     ctx->unget = false;
     return ctx->last;
-}
-
-bool lam_stmt_is_end(LamTokenTag t) {
-    return t == LEof || t == LEol || t == LSemicolon;
 }
 
 bool lam_parse_tk_next_is_end(RecDescCtx* ctx) {
@@ -60,10 +42,6 @@ bool lam_parse_tk_next_match_or_unget(RecDescCtx* ctx, LamTokenTag t) {
     return false;
 }
 
-Lstr lam_parse_tk_dup_kw(RecDescCtx* ctx) {
-    return lam_strndup(ctx->buf.s, ctx->buf.len);
-}
-
 
 ////
 /// Parser functions
@@ -81,8 +59,7 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
     } else if (lam_parse_tk_next_match_or_unget(ctx, LVar)) {
         return lam_var(lam_parse_tk_dup_kw(ctx));
     } else if (lam_parse_tk_next_match_or_unget(ctx, LName)) {
-        Lterm* t = lam_name_search(lam_parse_tk_dup_kw(ctx).s);
-        return lam_clone(t);
+        return lam_symbols_search_clone(lam_parse_tk_dup_kw(ctx));
     }
     return (Lterm*)NotParse;
 }
