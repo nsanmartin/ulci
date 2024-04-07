@@ -4,7 +4,7 @@
 #include <readline/history.h>
 
 #include <parser-lam-reader.h>
-#include <lam-symbols.h>
+#include <symbols.h>
 
 
 int interactive() {

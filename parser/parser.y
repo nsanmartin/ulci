@@ -11,7 +11,7 @@
     #include <stdio.h>
     #include <lam.h>
     #include <parser-lam-reader.h>
-    #include <lam-symbols.h>
+    #include <symbols.h>
     #define YYDEBUG 1
 }
 

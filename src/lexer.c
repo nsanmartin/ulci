@@ -6,7 +6,7 @@
 
 #include <lexer.h>
 #include <str.h>
-#include <lam-symbols.h>
+#include <symbols.h>
 //#include <parser-lam-reader.h>
 //#include <parser-names.h>
 

@@ -5,7 +5,7 @@
 
 #include <lexer.h>
 #include <eval.h>
-#include <lam-symbols.h>
+#include <symbols.h>
 #include <recursive-descent.h>
 #include <reduce.h>
 

@@ -1,7 +1,7 @@
 #include <lam.h>
 #include <eval.h>
 #include <recursive-descent.h>
-#include <lam-symbols.h>
+#include <symbols.h>
 
 Lterm* lam_parse_expression(RecDescCtx* ctx) ;
 

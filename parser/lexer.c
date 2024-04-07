@@ -5,7 +5,7 @@
 
 #include <lexer.h>
 #include <parser-lam-reader.h>
-#include <lam-symbols.h>
+#include <symbols.h>
 
 void scan_eol() {
     LamTokenTag tk = LamTokenTagsLen;
