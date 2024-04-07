@@ -101,7 +101,7 @@ LamTokenTag lam_scan_next(LamKeywordBuf buf[static 1]) {
         return LError;
     }
     buf->len = 0;
-    for (;;++buf->len) {
+    for (;;) {
         assert_keyword_len_is_valid(buf->len);
         buf->s[buf->len++] = c;
         c = _lam_getc();
