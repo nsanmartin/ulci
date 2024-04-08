@@ -59,7 +59,7 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
     } else if (lam_parse_tk_next_match_or_unget(ctx, LVar)) {
         return lam_var(lam_parse_tk_dup_kw(ctx));
     } else if (lam_parse_tk_next_match_or_unget(ctx, LName)) {
-        return lam_symbols_search_clone(lam_parse_tk_dup_kw(ctx));
+        return lam_symbols_search_clone(lam_parse_tk_kw_view(ctx));
     }
     return (Lterm*)NotParse;
 }
@@ -128,6 +128,7 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     }
     if (!lam_parse_tk_next_is_end(ctx)) {
         free((void*)v.s);
+        lam_free_term(expr);
         lam_parse_tk_unget(ctx);
         return (Lterm*)SyntaxError;
     }

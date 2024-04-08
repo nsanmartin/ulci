@@ -27,10 +27,6 @@ void* lam_malloc(size_t size) {
 #endif
 }
 
-void lam_free(void* ptr) {
-    free(ptr);
-}
-
 void lam_free_mem(void) {
 #ifdef TESTMEM
     printf("malloc calls: %d\n", lam_free_mem_ix);

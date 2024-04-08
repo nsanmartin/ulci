@@ -18,7 +18,7 @@ void reduce_print(Lterm t[static 1], void* ignore) {
     (void) ignore;
     void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
 
-    const Lterm* v = lam_reduce(t);
+    t = lam_reduce(t);
     if (t == NotReducing) {
         printf("eval error: %s\nterm: '", "term is not reducing");
         on_parse(t);
@@ -30,7 +30,7 @@ void reduce_print(Lterm t[static 1], void* ignore) {
     } else if (!t || t == LamInternalError) {
         puts("Lam eval internal error");
     } else {
-        on_parse(v);
+        on_parse(t);
     }
     puts("");
 }
