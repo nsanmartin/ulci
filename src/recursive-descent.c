@@ -116,18 +116,25 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
         return (Lterm*)SyntaxError;
     }
     Lstr v = lam_parse_tk_dup_kw(ctx);
+    if (lam_str_null(v)) { return 0x0; }
     if (!lam_parse_tk_next_match_or_unget(ctx, LEquals)) {
+        free((void*)v.s);
         return (Lterm*)SyntaxError;
     }
     Lterm* expr = lam_parse_expression(ctx);
-    if (lam_parse_term_failed(expr)) { return (Lterm*)SyntaxError; }
+    if (lam_parse_term_failed(expr)) {
+        free((void*)v.s);
+        return (Lterm*)SyntaxError;
+    }
     if (!lam_parse_tk_next_is_end(ctx)) {
+        free((void*)v.s);
         lam_parse_tk_unget(ctx);
         return (Lterm*)SyntaxError;
     }
 
     int err = lam_str_name_insert(v, (Lterm*)expr);
     if (err) {
+        free((void*)v.s);
         lam_free_term(expr);
     }
     return lam_clone(expr);
