@@ -116,6 +116,7 @@ bool lam_is_var_free_in(const Lterm t[static 1], Lstr n) ;
 int lam_max_reserved_var_len(const Lterm t[static 1]) ;
 Lstr lam_get_fresh_var_name(const Lterm t[static 1]) ;
 int lam_rename_var(Lterm t[static 1], Lstr varname, Lstr newname) ;
+int lam_rename_var_in_place(Lterm t[static 1], Lstr varname, Lstr newname) ;
 const char* lam_get_form_name_cstr(const Lterm t[static 1]) ;
 bool lam_are_identical(const Lterm t[static 1], const Lterm u[static 1]) ;
 Lterm*

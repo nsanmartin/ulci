@@ -255,12 +255,13 @@ int lam_max_reserved_var_len(const Lterm t[static 1]) {
 
 Lstr lam_get_fresh_var_name(const Lterm t[static 1]) {
     const int len = lam_max_reserved_var_len(t) + 1;
-    char* rv = lam_malloc(sizeof(*rv) * (len+ 1));
-    if (!rv) { return LEMPTY_STR(); }
+    char* rv = lam_malloc(sizeof(char) * (len + 1));
+    if (!rv) {
+        puts("Not memory, aborting."); exit(EXIT_FAILURE);
+    }
     memset(rv, var_reserved_char, len);
     rv[len] = '\0';
-    printf("fresh var: %s\n", rv);
-    return lam_str(rv);
+    return lam_strn_view(rv, len);
 }
 
 /**
@@ -292,6 +293,37 @@ int lam_rename_var(Lterm t[static 1], Lstr varname, Lstr newname) {
                 + lam_rename_var(t->app.param, varname, newname);
                       }
         default: LOG_INVALID_LTERM_AND_EXIT ;
+    }
+}
+
+
+int lam_rename_var_in_place(Lterm t[static 1], Lstr varname, Lstr newname) {
+    switch(t->tag) {
+        case Lvartag: {
+            if (lam_str_eq(varname, t->var.name)) {
+                free((void*)t->var.name.s);
+                t->var.name = lam_lstr_dup(newname);
+                if (lam_str_null(t->var.name)) {
+                    return -1;
+                }
+            }
+            return 0;
+        }
+        case Labstag: {
+            if (lam_str_eq(t->abs.vname, varname)) {
+                free((void*)t->abs.vname.s);
+                t->abs.vname = lam_lstr_dup(newname);
+                if (lam_str_null(t->abs.vname)) {
+                    return -1;
+                }
+            }
+            return lam_rename_var(t->abs.body, varname, newname);
+        }
+        case Lapptag: {
+            return lam_rename_var(t->app.fun, varname, newname) 
+                 | lam_rename_var(t->app.param, varname, newname);
+       }
+       default: LOG_INVALID_LTERM_AND_EXIT ;
     }
 }
 

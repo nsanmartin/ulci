@@ -8,7 +8,7 @@ int test_parse_impl(const char* s, const char* out, const char* expected) {
     if (strcmp(out, expected)) {
         fprintf(
             stderr,
-            RED "Error parsing" RESET "\n"
+            RED "itests: error parsing or reducing" RESET "\n"
             "  test\t %s\n  res\t %s\n  exp\t %s\n",
             s, out, expected);
         return -1;

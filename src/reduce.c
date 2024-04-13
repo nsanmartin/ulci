@@ -1,6 +1,6 @@
 #include <lam.h>
 
-//TODOP: rename (Cf. l:61)
+//TODOP: rename (Cf. l:61) to subst
 Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
     switch(body->tag) {
         case Lvartag: {
@@ -19,11 +19,23 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
             if (lam_is_var_free_in(body, x)) {
                 if (lam_is_var_free_in(s, body->abs.vname)) {
                     //TODO: review this
-                    puts("rename var! (TODO: remove me)====="); exit(1);
-                    ///Lstr fresh_name = lam_get_fresh_var_name(body);
-                    ///if (lam_str_null(fresh_name)) { return 0x0; }
-                    ///lam_rename_var(body->abs.body, body->abs.vname, fresh_name);
-					///body->abs.vname = fresh_name;
+                    Lstr fresh_name = lam_get_fresh_var_name(body);
+                    printf("fresh name: %s\n", fresh_name.s);
+                    if (lam_str_null(fresh_name)) {
+                        lam_free_term(body);
+                        lam_free_term(s);
+                        free((void*)x.s);
+                        return 0x0;
+                    }
+                    if (lam_rename_var_in_place(body->abs.body, body->abs.vname, fresh_name)) {
+                        lam_free_term(body);
+                        lam_free_term(s);
+                        free((void*)x.s);
+                        free((void*)fresh_name.s);
+                        return 0x0;
+                    };
+                    //free((void*)fresh_name.s);
+					body->abs.vname = fresh_name;
                 }
 
                 Lterm* b = lam_reduce_abs(body->abs.body, lam_lstr_dup(x), lam_clone(s));
