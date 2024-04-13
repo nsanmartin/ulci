@@ -1,4 +1,5 @@
 #include <parser-lam-reader.h>
+#include <recursive-descent.h>
 #include <eval.h>
 
 void yyerror(const char* s) {
@@ -45,6 +46,7 @@ Lstr eval_string(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
     }
     return LamStr("Error: no parse");
 }
+
 
 void read_eval_print(const Lterm t[static 1]) {
     EvalCtx ctx = {.len0=lam_term_len(t)};

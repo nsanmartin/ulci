@@ -9,34 +9,6 @@
 #include <recursive-descent.h>
 #include <reduce.h>
 
-void free_term_callback(Lterm t[static 1], void* ignore) {
-    (void) ignore;
-    lam_free_term(t);
-}
-
-void reduce_print_free(Lterm* t, void* ignore) {
-    (void) ignore;
-    void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
-
-    t = lam_reduce(t);
-    if (t == NotReducing) {
-        printf("eval error: %s\nterm: '", "term is not reducing");
-        on_parse(t);
-        lam_free_term(t);
-        puts("'");
-    } else if (t == EvalStackTooLarge) {
-        printf("eval error: %s\nterm: '", "eval stack too large");
-        on_parse(t);
-        puts("'");
-    } else if (!t || t == LamInternalError) {
-        puts("Lam eval internal error");
-    } else {
-        on_parse(t);
-        lam_free_term(t);
-    }
-    puts("");
-}
-
 
 int interactive_interpreter(StmtReadCallback* callback) {
     char* line = NULL;
@@ -53,7 +25,7 @@ int interactive_interpreter(StmtReadCallback* callback) {
 
 int main (int argc, char* argv[]) {
     StmtReadCallback callback[3] = {
-        { .callback=reduce_print_free },
+        { .callback=reduce_print_free_callback },
         //{ .callback=free_term_callback },
         {0}
     };

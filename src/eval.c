@@ -96,9 +96,9 @@ void eval_print(const Lterm t[static 1], void* ignore) {
     puts("");
 }
 
-void eval_to_list(Lterm t[static 1], void* acum) {
-    EvalCtx ctx = {.len0=lam_term_len(t)};
-    const Lterm* v = lam_eval_with_ctx(t, &ctx);
+void eval_to_list(Lterm* t[static 1], void* acum) {
+    EvalCtx ctx = {.len0=lam_term_len(*t)};
+    const Lterm* v = lam_eval_with_ctx(*t, &ctx);
     if (acum) {
 
         LtermList* node = lam_malloc(sizeof(LtermList));

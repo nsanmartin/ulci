@@ -213,7 +213,7 @@ Lterm* lam_reduce(Lterm* t) {
         ; nreds < max_reductions && !lam_normal_form(t)
         ; ++nreds, t = lam_reduce_step(t)
     ) {
-        if (nreds % 999 == 0) { lam_term_log(t, nreds); }
+        //if (nreds % 999 == 0) { lam_term_log(t, nreds); }
     }
     if (nreds == max_reductions) {
         puts("too many reductions");

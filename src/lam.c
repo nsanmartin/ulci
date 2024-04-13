@@ -5,6 +5,8 @@
 
 #include "lam.h"
 #include "mem.h"
+#include <reduce.h>
+#include <recursive-descent.h>
 
 
 //// Lterm values that denote errors:
@@ -569,3 +571,70 @@ bool lam_normal_form(const Lterm t[static 1]) {
                 && lam_normal_form(t->app.param))
         ;
 }
+
+/*
+ * Utils
+ */
+
+// Callbacks
+
+void lam_pcb_id(Lterm* tptr[static 1], /*(Lterm**)*/void* rvp) { *(Lterm**)rvp = *tptr; }
+
+void free_term_callback(Lterm* tptr[static 1], void* ignore) {
+    (void) ignore;
+    lam_free_term(*tptr);
+}
+
+void lam_pcb_reduce(Lterm* tptr[static 1], /*Lterm** */void* rvp) {
+    *tptr = lam_reduce(*tptr);
+    *(Lterm**)rvp = *tptr;
+}
+
+void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
+    (void) ignore;
+    void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
+    Lterm* t = *tptr;
+
+    t = lam_reduce(t);
+    *tptr = t;
+    if (t == NotReducing) {
+        printf("eval error: %s\nterm: '", "term is not reducing");
+        on_parse(t);
+        lam_free_term(t);
+        puts("'");
+    } else if (t == EvalStackTooLarge) {
+        printf("eval error: %s\nterm: '", "eval stack too large");
+        on_parse(t);
+        puts("'");
+    } else if (!t || t == LamInternalError) {
+        puts("Lam eval internal error");
+    } else {
+        on_parse(t);
+        lam_free_term(t);
+    }
+    puts("");
+}
+
+
+// Eval
+
+Lterm* parse_string_rec_desc(const char* in) {
+    Lterm* t = 0x0;
+    StmtReadCallback callback[2] = { { .callback=lam_pcb_id, .acum=&t}, {0} };
+    lam_scan_set_str_input(in);
+    lam_parse_stmts(callback);
+    return t;
+}
+
+Lstr parse_string_rec_desc_to_str(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
+    Lterm* t = parse_string_rec_desc(in);
+    Lstr rv = to_str(t);
+    return rv;
+}
+
+Lstr parse_string_rec_desc_reduce_to_str(const char* in, Lstr (*to_str)(const Lterm[static 1])) {
+    Lterm* t = parse_string_rec_desc(in);
+    Lstr rv = to_str(lam_reduce(t));
+    return rv;
+}
+

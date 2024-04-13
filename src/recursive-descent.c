@@ -141,7 +141,7 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     return lam_clone(expr);
 }
 
-void lam_parse_apply_callbacks(StmtReadCallback* callbackp, Lterm t[static 1]) {
+void lam_parse_apply_callbacks(StmtReadCallback* callbackp, Lterm* t[static 1]) {
     if (!callbackp) { puts("Lam error: lam_parse_stmt NULL callback, aborting."); exit(EXIT_FAILURE); }
     for (; callbackp->callback; ++callbackp) {
             callbackp->callback(t, callbackp->acum);
@@ -155,16 +155,16 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
         if (lam_parse_tk_next_is_end(&ctx)) { continue; }
         lam_parse_tk_unget(&ctx);
 
-        Lterm* set_stmt = lam_parse_stmt_set(&ctx);
-        if (set_stmt == SyntaxError) {
+        Lterm* set_expr = lam_parse_stmt_set(&ctx);
+        if (set_expr == SyntaxError) {
             puts("syntax error");
             continue;
-        } else if (!set_stmt || set_stmt == LamInternalError) {
+        } else if (!set_expr || set_expr == LamInternalError) {
             puts("lam internal error, aborting.");
             exit(EXIT_FAILURE);
-        } else if (set_stmt != NotParse) {
-            //on_stmt_read->callback((Lterm*)set_stmt, on_stmt_read->acum);
-            lam_parse_apply_callbacks(on_stmt_read, set_stmt);
+        } else if (set_expr != NotParse) {
+            //on_stmt_read->callback((Lterm*)set_expr, on_stmt_read->acum);
+            lam_parse_apply_callbacks(on_stmt_read, &set_expr);
             continue;
         }
 
@@ -181,7 +181,7 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
             puts("Error parsing expression");
         } else {
             //on_stmt_read->callback((Lterm*)t, on_stmt_read->acum);
-            lam_parse_apply_callbacks(on_stmt_read, t);
+            lam_parse_apply_callbacks(on_stmt_read, &t);
         }
     }
 }

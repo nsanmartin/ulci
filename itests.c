@@ -19,32 +19,32 @@ int test_parse_impl(const char* s, const char* out, const char* expected) {
 }
 
 void test_parse_all_paren(const char* test, const char* expected) {
-    if(test_parse_impl(
-        test, parse_string(test, lam_term_to_str_more_paren).s, expected
-    )) {
+    const char* obtained = parse_string_rec_desc_to_str(test, lam_term_to_str_more_paren).s;
+    if(test_parse_impl(test, obtained, expected)) {
         exit(1);
     };
 }
 
 void test_parse_convention(const char* test, const char* expected) {
-    if(test_parse_impl(
-        test, parse_string(test, lam_term_to_str_less_paren).s, expected
-    )) {
+    const char* obtained = parse_string_rec_desc_to_str(test, lam_term_to_str_less_paren).s;
+    if(test_parse_impl(test, obtained, expected)) {
         exit(1);
     };
 }
 
 void test_eval_all_paren(const char* test, const char* expected) {
+    const char* obtained = parse_string_rec_desc_reduce_to_str(test, lam_term_to_str_more_paren).s;
     if(test_parse_impl(
-        test, eval_string(test, lam_term_to_str_more_paren).s, expected
+        test, obtained, expected
     )) {
         exit(1);
     };
 }
 
 void test_eval_convention(const char* test, const char* expected) {
+    const char* obtained = parse_string_rec_desc_reduce_to_str(test, lam_term_to_str_less_paren).s;
     if(test_parse_impl(
-        test, eval_string(test, lam_term_to_str_less_paren).s, expected
+        test, obtained, expected
     )) {
         exit(1);
     };

@@ -26,6 +26,6 @@ Lterm* lam_eval(const Lterm t[static 1]) ;
 const Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx* ctx) ;
 unsigned lam_term_len(const Lterm* t) ;
 void eval_print(const Lterm t[static 1], void* ignore);
-void eval_to_list(Lterm t[static 1], void* acum);
+void eval_to_list(Lterm* t[static 1], void* acum);
 
 #endif
