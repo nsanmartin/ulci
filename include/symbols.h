@@ -7,7 +7,7 @@
 
 
 typedef struct {
-    unsigned int v;
+    unsigned int v; //TODO: remove this attribute
     Lterm* t;
     Lstr k;
 } Entry;

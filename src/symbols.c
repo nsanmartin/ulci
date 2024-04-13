@@ -69,15 +69,28 @@ Lterm* lam_name_search(const char* name) {
     return 0x0;
 }
 
-unsigned long string_hash(const unsigned char *str) {
+unsigned long lstr_hash(Lstr s) {
     unsigned long hash = 5381;
     int c;
+    const char* end = s.s + s.len;
 
-    while ((c = *str++))
+    for (const char* str = s.s; str < end; ++str) {
+        c = *str;
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    }
 
     return hash;
 }
+
+//unsigned long string_hash(const unsigned char *str) {
+//    unsigned long hash = 5381;
+//    int c;
+//
+//    while ((c = *str++))
+//        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+//
+//    return hash;
+//}
 
 int stringTableInitWithSize(StringTable st[static 1], size_t size, size_t max_tries) {
     Entry* table = calloc(size, sizeof (Entry));
@@ -99,7 +112,7 @@ void stringTableSearch(StringTable m[static 1], Lstr k, Result res[static 1]) {
         return;
     }
 
-    unsigned int h = string_hash((const unsigned char*)k.s) % m->size;
+    unsigned int h = lstr_hash(k) % m->size;
     unsigned int nmovs = 0;
     while (nmovs < m->max_tries) {
 
@@ -119,7 +132,7 @@ bool stringTableContains(StringTable* m, Lstr k) {
         return false;
     }
 
-    unsigned int h = string_hash((const unsigned char*)k.s) % m->size;
+    unsigned int h = lstr_hash(k) % m->size;
     unsigned int nmovs = 0;
     while (nmovs < m->max_tries) {
 
@@ -142,7 +155,7 @@ void stringTableInsert(StringTable* m, Lstr k, Lterm* t, Result* res) {
         return;
     }
 
-    unsigned int h = string_hash((const unsigned char*)k.s) % m->size;
+    unsigned int h = lstr_hash(k) % m->size;
     unsigned int nmovs = 0;
     while (nmovs < m->max_tries) {
 

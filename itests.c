@@ -50,7 +50,17 @@ void test_eval_convention(const char* test, const char* expected) {
     };
 }
 
-int main (void) {
+int mini_test (void) {
+    if(initialize_symbol_table()) {
+        fprintf(stderr, "Error: not memory to initialize parser\n"); return -1;
+    }
+
+    test_eval_convention("set id = \\x.x", "\\x.x");
+    test_eval_convention("set apply = \\f.f(\\x.(f x));", "\\f.f (\\x.f x)");
+    test_eval_convention( "apply id x;", "x");
+}
+
+int main(void) {
     if(initialize_symbol_table()) {
         fprintf(stderr, "Error: not memory to initialize parser\n");
         return -1;
@@ -185,7 +195,6 @@ int main (void) {
     puts("eval subst");
     test_eval_convention("(\\x. x x) (\\x.x)",  "\\x.x");
     test_eval_convention("((\\x.(x y)) (\\x.(x y)))", "y y");
-
-
+    return 0;
 }
 
