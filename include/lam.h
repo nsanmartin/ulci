@@ -94,6 +94,10 @@ Lterm* lam_app(Lterm fun[static 1], Lterm param[static 1]);
 
 Lstr lam_get_form_name(const Lterm t[static 1]) ;
 void lam_free_term(Lterm* t) ;
+//static inline void lam_free_term_callback(void* t) {
+//    lam_free_term((Lterm*) t);
+//}
+
 Lterm* lam_clone(const Lterm t[static 1]) ;
 Lterm* lam_new_var(Lstr x) ;
 Lterm* lam_new_abs(Lstr x, const Lterm body[static 1]) ;

@@ -35,9 +35,3 @@ void lam_free_mem(void) {
     }
 #endif
 }
-
-char* lam_strdup(const char* s) {
-    return strdup(s);
-}
-
-

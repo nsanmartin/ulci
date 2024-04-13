@@ -14,7 +14,7 @@ void free_term_callback(Lterm t[static 1], void* ignore) {
     lam_free_term(t);
 }
 
-void reduce_print(Lterm t[static 1], void* ignore) {
+void reduce_print_free(Lterm* t, void* ignore) {
     (void) ignore;
     void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
 
@@ -22,6 +22,7 @@ void reduce_print(Lterm t[static 1], void* ignore) {
     if (t == NotReducing) {
         printf("eval error: %s\nterm: '", "term is not reducing");
         on_parse(t);
+        lam_free_term(t);
         puts("'");
     } else if (t == EvalStackTooLarge) {
         printf("eval error: %s\nterm: '", "eval stack too large");
@@ -31,6 +32,7 @@ void reduce_print(Lterm t[static 1], void* ignore) {
         puts("Lam eval internal error");
     } else {
         on_parse(t);
+        lam_free_term(t);
     }
     puts("");
 }
@@ -51,8 +53,8 @@ int interactive_interpreter(StmtReadCallback* callback) {
 
 int main (int argc, char* argv[]) {
     StmtReadCallback callback[3] = {
-        { .callback=reduce_print },
-        { .callback=free_term_callback },
+        { .callback=reduce_print_free },
+        //{ .callback=free_term_callback },
         {0}
     };
     if(initialize_symbol_table()) {
@@ -67,10 +69,12 @@ int main (int argc, char* argv[]) {
             if (fp) {
                 lam_scan_set_file_input(fp);
                 lam_parse_stmts(callback);
+                fclose(fp);
             } else {
                 printf("Could not read %s\n", argv[i]);
             }
         }
     }
+    free_symbol_table();
     return 0;
 }

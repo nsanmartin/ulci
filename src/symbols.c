@@ -12,13 +12,16 @@ int initialize_symbol_table(void) {
     return stringTableInitWithSize(&_symbols, 100, 17);
 }
 
-void freeSymbolTable(StringTable* t) {
-    if (t) {
-        for (unsigned long i = 0; i < t->size; ++i) {
-            Entry* e = t->table + i;
-            lam_free_term(e->t);
-            lam_free((void*)e->k.s);
+void free_symbol_table() {
+    if (_symbols.table) {
+        for (unsigned long i = 0; i < _symbols.size; ++i) {
+            Entry* e = _symbols.table + i;
+            if (e->k.s) {
+                lam_free_term(e->t);
+                lam_free((void*)e->k.s);
+            }
         }
+        free(_symbols.table);
     }
 }
 
@@ -166,3 +169,4 @@ void stringTableInsert(StringTable* m, Lstr k, Lterm* t, Result* res) {
     }
     fprintf(stderr, "COuld not insert key in table!\n");
 }
+

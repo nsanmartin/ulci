@@ -27,7 +27,7 @@ long used_fresh_vars = 0;
 
 unsigned nfred = 0;
 void lam_free_term(Lterm* t) {
-    printf("nfred: %d\n", nfred++);
+    //printf("nfred: %d\n", nfred++);
     if (lam_invalid_term(t)) {
         puts("DEBUG: freeing invalid term :/");
         LOG_INVALID_LTERM_AND_EXIT;
@@ -268,6 +268,7 @@ Lstr lam_get_fresh_var_name(const Lterm t[static 1]) {
 
 
 int lam_rename_var(Lterm t[static 1], Lstr varname, Lstr newname) {
+    //TODO: review
     switch(t->tag) {
         case Lvartag: {
             if (lam_str_eq(varname, t->var.name)) {

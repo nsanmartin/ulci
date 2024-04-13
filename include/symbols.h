@@ -30,6 +30,7 @@ bool lam_name_is_defined(const char* name);
 bool lam_str_name_is_defined(Lstr name);
 
 int initialize_symbol_table(void);
+void free_symbol_table();
 int lam_name_insert(const char* name, Lterm* t);
 int lam_str_name_insert(Lstr name, Lterm* t) ;
 Lterm* lam_name_search(const char* name);

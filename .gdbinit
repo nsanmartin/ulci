@@ -1,2 +1,2 @@
-b lam_free_term
-condition 1 nfred >= 287
+b free_term_callback
+b lam_reduce

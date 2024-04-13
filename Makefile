@@ -3,7 +3,7 @@
 # CC=zig cc 
 # CC=clang
 
-CFLAGS:=-g -O3 -Wall -Wextra -pedantic -Iinclude -Ibdwgc/include
+CFLAGS:=-g  -Wall -Wextra -pedantic -Iinclude -Ibdwgc/include
 STRICT_CFLAGS:= -Werror
 
 BUILD=./build
@@ -90,6 +90,9 @@ bison: build/parser.tab.c
 bison-no-warnings:
 	bison -t -d -o $(BISON_SRC) $(PARSER_DIR)/parser.y
 
+
+valgrind-t:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter $T
 
 valgrind-var:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter samples/var

@@ -3,12 +3,14 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 void* lam_malloc(size_t size) ;
 void lam_free_mem(void);
-char* lam_strdup(const char* s) ;
+//char* lam_strdup(const char* s) ;
 
 static inline void lam_free(void* ptr) { free(ptr); }
+static inline char* lam_strdup(const char* s) { return strdup(s); }
 
 #endif
 
