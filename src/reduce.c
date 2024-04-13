@@ -34,8 +34,9 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
                     free((void*)x.s);
                     return b;
                 }
+                body->abs.body = b;
                 free((void*)x.s);
-                return b;
+                return body;
             } else { //x is captured by \x
                 free((void*)x.s);
                 lam_free_term(s);
