@@ -9,31 +9,28 @@
 #include <recursive-descent.h>
 
 
-//// Lterm values that denote errors:
-///
-const Lterm* LamInternalError = &(Lterm){
-    .var={.name={.s="LamInternalError"}}
-};
-// parse error
-const Lterm* NotParse = &(Lterm){.var={.name={.s="NotParse"}}};
-const Lterm* SyntaxError = &(Lterm){.var={.name={.s="SyntaxError"}}};
-// eval errors
-const Lterm* NotReducing = &(Lterm){.var={.name={.s="NotReducing"}}};
-const Lterm* TooManyReductions = &(Lterm){
-    .var={.name={.s="TooManyReductions"}}
-};
-////
+/// //// Lterm values that denote errors:
+/// ///
+/// const Lterm* LamInternalError = &(Lterm){
+///     .var={.name={.s="LamInternalError"}}
+/// };
+/// // parse error
+/// const Lterm* NotParse = &(Lterm){.var={.name={.s="NotParse"}}};
+/// const Lterm* SyntaxError = &(Lterm){.var={.name={.s="SyntaxError"}}};
+/// // eval errors
+/// const Lterm* NotReducing = &(Lterm){.var={.name={.s="NotReducing"}}};
+/// const Lterm* TooManyReductions = &(Lterm){
+///     .var={.name={.s="TooManyReductions"}}
+/// };
+/// ////
 
 
 long used_fresh_vars = 0;
 
 unsigned nfred = 0;
 void lam_free_term(Lterm* t) {
-    //printf("nfred: %d\n", nfred++);
-    if (lam_invalid_term(t)) {
-        puts("DEBUG: freeing invalid term :/");
-        LOG_INVALID_LTERM_AND_EXIT;
-    }
+    if (!t) { puts("DEBUG: freeing NULL term :/"); LOG_INVALID_LTERM_AND_EXIT; }
+
     switch (t->tag) {
         case Lvartag: {
             lam_free((void*)t->var.name.s);
@@ -49,6 +46,13 @@ void lam_free_term(Lterm* t) {
         case Lapptag: {
             lam_free_term(t->app.fun);
             lam_free_term(t->app.param);
+            lam_free(t);
+            return;
+        }
+        case Lerrtag: {
+            if (t->err.t) {
+                lam_free_term(t->err.t);
+            }
             lam_free(t);
             return;
         }
@@ -111,6 +115,41 @@ unsigned lam_term_height(const Lterm* t) {
  * Factory methods
  **/
 
+Lterm* lam_not_parse() {
+    Lterm* rv = lam_malloc(sizeof (Lterm));
+    if (!rv) { return 0x0; }
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotParseTag, .t=0x0 }};
+    return rv;
+}
+
+//TODO: store info?
+Lterm* lam_syntax_error() {
+    Lterm* rv = lam_malloc(sizeof (Lterm));
+    if (!rv) { return 0x0; }
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LSyntaxErrorTag, .t=0x0 }};
+    return rv;
+}
+
+Lterm* lam_internal_error() {
+    Lterm* rv = lam_malloc(sizeof (Lterm));
+    if (!rv) { return 0x0; }
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LInternalErrorTag, .t=0x0 }};
+    return rv;
+}
+
+Lterm* lam_not_reducing() {
+    Lterm* rv = lam_malloc(sizeof (Lterm));
+    if (!rv) { return 0x0; }
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotReducingTag, .t=0x0 }};
+    return rv;
+}
+
+Lterm* lam_too_many_reductions() {
+    Lterm* rv = lam_malloc(sizeof (Lterm));
+    if (!rv) { return 0x0; }
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LTooManyReductionsTag, .t=0x0 }};
+    return rv;
+}
 
 Lterm* lam_new_var(Lstr n) {
     if (lam_str_null(n)) { return 0x0; } 
@@ -629,17 +668,20 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
     Lterm* t = lam_reduce(*tptr);
     *tptr = t;
 
-    if (t == NotReducing) {
-        printf("eval error: term is not reducing\n");
-    } else if (t == TooManyReductions) {
-        puts("eval error: too many reductions");
-    } else if (!t || t == LamInternalError) {
-        puts("Lam internal error");
+    if (!t || t->tag == Lerrtag) {
+        if (t && t->err.tag == LNotReducingTag) {
+            printf("eval error: term is not reducing\n");
+        } else if (t && t->err.tag == LTooManyReductionsTag) {
+            puts("eval error: too many reductions");
+        }
+        else {//(!t || t->err.tag == LamInternalError) {
+            puts("Lam internal error");
+        }
     } else {
         on_parse(t);
-        lam_free_term(t);
     }
     puts("");
+    lam_free_term(t);
 }
 
 

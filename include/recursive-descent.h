@@ -21,14 +21,33 @@ typedef struct {
 void lam_parse_stmts(StmtReadCallback* on_stmt_read) ;
 
 static inline bool lam_parse_term_failed(const Lterm* t) {
-    return !t
-        || t == NotParse
-        || t == SyntaxError
-        || t == LamInternalError;
+    return !t || (t->tag == Lerrtag
+        && (
+            t->err.tag == LNotParseTag
+            || t->err.tag == LSyntaxErrorTag
+            || t->err.tag == LInternalErrorTag
+        )
+    );
 }
 
-static inline bool lam_parse_error(const Lterm* t) {
-    return !t || t == SyntaxError || t == LamInternalError;
+/*
+ * An "exception" during parsing includes s syntax error (the user proviedd an invalid input)
+ * or an internal lam error (NULL ptr or LInternalError).
+ */
+static inline bool lam_parse_term_exception(const Lterm* t) {
+    return !t || (t->tag == Lerrtag && (t->err.tag == LSyntaxErrorTag || t->err.tag == LInternalErrorTag));
+}
+
+static inline bool lam_is_not_parse(const Lterm* t) {
+    return t && t->tag == Lerrtag && t->err.tag == LNotParseTag;
+}
+
+static inline bool lam_is_syntax_error(const Lterm* t) {
+    return t && t->tag == Lerrtag && t->err.tag == LSyntaxErrorTag;
+}
+
+static inline bool lam_is_internal_error(const Lterm* t) {
+    return !t || (t->tag == Lerrtag && t->err.tag == LInternalErrorTag);
 }
 
 static inline bool lam_parse_tk_match(RecDescCtx* ctx, LamTokenTag t) {

@@ -78,7 +78,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
             lam_free_term(body);
             lam_free_term(s);
             free((void*)x.s);
-             return (Lterm*)LamInternalError;
+             return lam_internal_error();
         };
     }
 }
@@ -150,7 +150,7 @@ Lterm* lam_red_subst(Lterm t[static 1], const Lstr x, Lterm s[static 1]) {
         }
         default: {
             lam_free(t);
-             return (Lterm*)LamInternalError;
+             return lam_internal_error();
         };
     }
 }
@@ -163,7 +163,7 @@ Lterm* lam_red_subst(Lterm t[static 1], const Lstr x, Lterm s[static 1]) {
  *
  */
 Lterm* lam_reduce_step(Lterm* t) {
-    if (!t) { return (Lterm*)LamInternalError; }
+    if (!t) { return lam_internal_error(); }
     switch (t->tag) {
         case Lvartag: return t;
         case Labstag: {
@@ -204,7 +204,7 @@ Lterm* lam_reduce_step(Lterm* t) {
         }
         default: {
             lam_free_term(t);
-            return (Lterm*)LamInternalError;
+            return lam_internal_error();
          };
     }
 }
@@ -238,14 +238,14 @@ Lterm* lam_reduce(Lterm* t) {
             unsigned new_theight = lam_term_height(t);
             if (new_tlen >= tlen && new_theight >= theight) {
                 lam_free_term(t);
-                return (Lterm*)NotReducing;
+                return lam_not_reducing();
             }
             tlen = new_tlen;
             theight = new_theight;
         }
     }
     if (nreds == max_reductions) {
-        return (Lterm*)TooManyReductions;
+        return lam_too_many_reductions();
     }
     return t;
 }

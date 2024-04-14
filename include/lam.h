@@ -26,8 +26,8 @@
 #define LOG_INVALID_LTERM_AND_EXIT                                     \
     LOG_INVALID_LTERM; exit(EXIT_FAILURE)
 
-typedef enum { Lvartag, Labstag, Lapptag } Lamtag;
-typedef enum { LinternalErrorTag, LNotParseTag, LSintaxErrorTag, LNotReducingTag, LTooManyReductionsTag } LerrorTag;
+typedef enum { Lvartag, Labstag, Lapptag, Lerrtag } Lamtag;
+typedef enum { LInternalErrorTag, LNotParseTag, LSyntaxErrorTag, LNotReducingTag, LTooManyReductionsTag } LerrorTag;
 
 typedef struct Lterm Lterm;
 
@@ -46,15 +46,15 @@ typedef struct Lterm {
     }; // Lterm | Lerror;
 } Lterm;
 
-// Lterm errors
-extern const Lterm* LamInternalError;
-// parse errors
-extern const Lterm* NotParse;
-extern const Lterm* SyntaxError;
-// eval errors
-extern const Lterm* NotReducing;
-extern const Lterm* TooManyReductions;
-////
+/// // Lterm errors
+/// extern const Lterm* LamInternalError;
+/// // parse errors
+/// extern const Lterm* NotParse;
+/// extern const Lterm* SyntaxError;
+/// // eval errors
+/// extern const Lterm* NotReducing;
+/// extern const Lterm* TooManyReductions;
+/// ////
 
 
 typedef struct LtermList {
@@ -66,18 +66,15 @@ typedef struct LtermList {
 void freeLtermList(LtermList* ls);
 
 static inline bool lam_invalid_term(const Lterm* t) {
-    return !t
-        || t == LamInternalError
-        || t == NotParse
-        || t == SyntaxError
-        || t == NotReducing
-        || t == TooManyReductions;
+    return !t || t->tag == Lerrtag;
+        ///|| t == LamInternalError
+        ///|| t == NotParse
+        ///|| t == SyntaxError
+        ///|| t == NotReducing
+        ///|| t == TooManyReductions;
 }
 
-static inline bool lam_eval_error(const Lterm* t) {
-    return !t || t == LamInternalError || t == TooManyReductions
-        || t == NotReducing;
-}
+//static inline bool lam_eval_error(const Lterm* t) { return !t || t == LamInternalError || t == TooManyReductions || t == NotReducing; }
 
 #define LVAR(NAME)                                                      \
     (Lterm){ .tag=Lvartag, .var=(Lvar){.name=NAME}} 
@@ -94,6 +91,11 @@ unsigned lam_term_height(const Lterm* t);
 Lterm* lam_var(Lstr n);
 Lterm* lam_abs(Lstr vn, Lterm body[static 1]);
 Lterm* lam_app(Lterm fun[static 1], Lterm param[static 1]);
+Lterm* lam_not_parse();
+Lterm* lam_syntax_error();
+Lterm* lam_internal_error();
+Lterm* lam_not_reducing();
+Lterm* lam_too_many_reductions();
 
 Lstr lam_get_form_name(const Lterm t[static 1]) ;
 void lam_free_term(Lterm* t) ;
