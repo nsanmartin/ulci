@@ -58,6 +58,7 @@ int mini_test (void) {
     test_eval_convention("set id = \\x.x", "\\x.x");
     test_eval_convention("set apply = \\f.f(\\x.(f x));", "\\f.f (\\x.f x)");
     test_eval_convention( "apply id x;", "x");
+    return 0;
 }
 
 int main(void) {
