@@ -50,7 +50,7 @@ extern const Lterm* NotParse;
 extern const Lterm* SyntaxError;
 // eval errors
 extern const Lterm* NotReducing;
-extern const Lterm* EvalStackTooLarge;
+extern const Lterm* TooManyReductions;
 ////
 
 
@@ -68,11 +68,11 @@ static inline bool lam_invalid_term(const Lterm* t) {
         || t == NotParse
         || t == SyntaxError
         || t == NotReducing
-        || t == EvalStackTooLarge;
+        || t == TooManyReductions;
 }
 
 static inline bool lam_eval_error(const Lterm* t) {
-    return !t || t == LamInternalError || t == EvalStackTooLarge
+    return !t || t == LamInternalError || t == TooManyReductions
         || t == NotReducing;
 }
 

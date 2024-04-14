@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <lam.h>
 
 //TODOP: rename (Cf. l:61) to subst
@@ -220,17 +221,31 @@ void lam_term_log(const Lterm* t, unsigned nreds) {
 }
 
 Lterm* lam_reduce(Lterm* t) {
-    unsigned max_reductions = 10000;
+    unsigned max_reductions = 1000;
     unsigned nreds = 0;
+
+    unsigned tlen = UINT_MAX;
+    unsigned theight = UINT_MAX;
+    unsigned measure_freq = 37;
+
     for (
         ; nreds < max_reductions && !lam_normal_form(t)
         ; ++nreds, t = lam_reduce_step(t)
     ) {
         //if (nreds % 999 == 0) { lam_term_log(t, nreds); }
+        if (nreds % measure_freq == 0) {
+            unsigned new_tlen = lam_term_len(t);
+            unsigned new_theight = lam_term_height(t);
+            if (new_tlen >= tlen && new_theight >= theight) {
+                lam_free_term(t);
+                return (Lterm*)NotReducing;
+            }
+            tlen = new_tlen;
+            theight = new_theight;
+        }
     }
     if (nreds == max_reductions) {
-        puts("too many reductions");
-        return (Lterm*)EvalStackTooLarge;
+        return (Lterm*)TooManyReductions;
     }
     return t;
 }

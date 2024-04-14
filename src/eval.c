@@ -37,7 +37,7 @@ const Lterm* lam_eval_with_ctx(const Lterm* t, EvalCtx* ctx) {
     if (lam_term_len(t) >= ctx->len0 && ctx->depth > 8) {
         return NotReducing;
     }
-    if (ctx->depth > 124000) { return EvalStackTooLarge; }
+    if (ctx->depth > 124000) { return TooManyReductions; }
 
     if (lam_normal_form(t)) { return lam_clone(t); }
     ctx->depth += 1;
@@ -84,7 +84,7 @@ void eval_print(const Lterm t[static 1], void* ignore) {
         printf("eval error: %s\nterm: '", "term is not reducing");
         on_parse(t);
         puts("'");
-    } else if (t == EvalStackTooLarge) {
+    } else if (t == TooManyReductions) {
         printf("eval error: %s\nterm: '", "eval stack too large");
         on_parse(t);
         puts("'");

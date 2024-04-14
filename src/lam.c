@@ -19,8 +19,8 @@ const Lterm* NotParse = &(Lterm){.var={.name={.s="NotParse"}}};
 const Lterm* SyntaxError = &(Lterm){.var={.name={.s="SyntaxError"}}};
 // eval errors
 const Lterm* NotReducing = &(Lterm){.var={.name={.s="NotReducing"}}};
-const Lterm* EvalStackTooLarge = &(Lterm){
-    .var={.name={.s="EvalStackTooLarge"}}
+const Lterm* TooManyReductions = &(Lterm){
+    .var={.name={.s="TooManyReductions"}}
 };
 ////
 
@@ -625,21 +625,16 @@ void lam_pcb_reduce(Lterm* tptr[static 1], /*Lterm** */void* rvp) {
 void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
     (void) ignore;
     void (*on_parse)(const Lterm t[static 1]) = lam_print_term_less_paren;
-    Lterm* t = *tptr;
 
-    t = lam_reduce(t);
+    Lterm* t = lam_reduce(*tptr);
     *tptr = t;
+
     if (t == NotReducing) {
-        printf("eval error: %s\nterm: '", "term is not reducing");
-        on_parse(t);
-        lam_free_term(t);
-        puts("'");
-    } else if (t == EvalStackTooLarge) {
-        printf("eval error: %s\nterm: '", "eval stack too large");
-        on_parse(t);
-        puts("'");
+        printf("eval error: term is not reducing\n");
+    } else if (t == TooManyReductions) {
+        puts("eval error: too many reductions");
     } else if (!t || t == LamInternalError) {
-        puts("Lam eval internal error");
+        puts("Lam internal error");
     } else {
         on_parse(t);
         lam_free_term(t);
