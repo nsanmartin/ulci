@@ -27,12 +27,14 @@
     LOG_INVALID_LTERM; exit(EXIT_FAILURE)
 
 typedef enum { Lvartag, Labstag, Lapptag } Lamtag;
+typedef enum { LinternalErrorTag, LNotParseTag, LSintaxErrorTag, LNotReducingTag, LTooManyReductionsTag } LerrorTag;
 
 typedef struct Lterm Lterm;
 
 typedef struct { Lstr name; } Lvar;
 typedef struct { Lstr vname; Lterm* body; } Labs;
 typedef struct { Lterm* fun; Lterm* param; } Lapp;
+typedef struct { LerrorTag tag; Lterm* t; } Lerr;
 
 typedef struct Lterm {
     Lamtag tag;
@@ -40,7 +42,8 @@ typedef struct Lterm {
         Lvar var;
         Labs abs;
         Lapp app;
-    }; //term;
+        Lerr err;
+    }; // Lterm | Lerror;
 } Lterm;
 
 // Lterm errors
