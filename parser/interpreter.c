@@ -48,5 +48,6 @@ int main (int argc, char* argv[]) {
         }
     }
     free_symbol_table();
+    //print_mem_summary();
     return 0;
 }

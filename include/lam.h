@@ -46,17 +46,6 @@ typedef struct Lterm {
     }; // Lterm | Lerror;
 } Lterm;
 
-/// // Lterm errors
-/// extern const Lterm* LamInternalError;
-/// // parse errors
-/// extern const Lterm* NotParse;
-/// extern const Lterm* SyntaxError;
-/// // eval errors
-/// extern const Lterm* NotReducing;
-/// extern const Lterm* TooManyReductions;
-/// ////
-
-
 typedef struct LtermList {
     const Lterm* t;
     struct LtermList* next;
@@ -67,11 +56,6 @@ void freeLtermList(LtermList* ls);
 
 static inline bool lam_invalid_term(const Lterm* t) {
     return !t || t->tag == Lerrtag;
-        ///|| t == LamInternalError
-        ///|| t == NotParse
-        ///|| t == SyntaxError
-        ///|| t == NotReducing
-        ///|| t == TooManyReductions;
 }
 
 //static inline bool lam_eval_error(const Lterm* t) { return !t || t == LamInternalError || t == TooManyReductions || t == NotReducing; }

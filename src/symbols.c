@@ -21,7 +21,7 @@ void free_symbol_table() {
                 lam_free((void*)e->k.s);
             }
         }
-        free(_symbols.table);
+        lam_free(_symbols.table);
     }
 }
 
@@ -93,7 +93,7 @@ unsigned long lstr_hash(Lstr s) {
 //}
 
 int stringTableInitWithSize(StringTable st[static 1], size_t size, size_t max_tries) {
-    Entry* table = calloc(size, sizeof (Entry));
+    Entry* table = lam_calloc(size, sizeof (Entry));
     if (!table) {
         fprintf(stderr, "NOt memory to initialize table!");
         return -1;

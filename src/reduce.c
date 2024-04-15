@@ -7,12 +7,12 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
         case Lvartag: {
             if (lam_str_eq(body->var.name, x)) { 
                 lam_free_term(body);
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 return s;
             }
             else {
                 lam_free_term(s);
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 return body;
             }
         }
@@ -25,17 +25,16 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
                     if (lam_str_null(fresh_name)) {
                         lam_free_term(body);
                         lam_free_term(s);
-                        free((void*)x.s);
+                        lam_free((void*)x.s);
                         return 0x0;
                     }
                     if (lam_rename_var_in_place(body->abs.body, body->abs.vname, fresh_name)) {
                         lam_free_term(body);
                         lam_free_term(s);
-                        free((void*)x.s);
-                        free((void*)fresh_name.s);
+                        lam_free((void*)x.s);
+                        lam_free((void*)fresh_name.s);
                         return 0x0;
                     };
-                    //free((void*)fresh_name.s);
 					body->abs.vname = fresh_name;
                 }
 
@@ -44,14 +43,14 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
                     puts("DEBUG: invalid term"); 
                     lam_free(s);
                     lam_free(body);
-                    free((void*)x.s);
+                    lam_free((void*)x.s);
                     return b;
                 }
                 body->abs.body = b;
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 return body;
             } else { //x is captured by \x
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 lam_free_term(s);
                 return body;
             }
@@ -59,7 +58,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
         case Lapptag: {
             Lterm* fred = lam_reduce_abs(body->app.fun, lam_lstr_dup(x), lam_clone(s));
             if (lam_invalid_term(fred)) {
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 lam_free_term(s);
                 lam_free_term(body);
                 return fred;
@@ -67,7 +66,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
             body->app.fun = fred;
             Lterm* pred = lam_reduce_abs(body->app.param, x, s);
             if (lam_invalid_term(pred)) {
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 lam_free_term(body);
                 return pred;
             }
@@ -77,7 +76,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
         default: {
             lam_free_term(body);
             lam_free_term(s);
-            free((void*)x.s);
+            lam_free((void*)x.s);
              return lam_internal_error();
         };
     }
@@ -89,12 +88,12 @@ Lterm* lam_red_subst(Lterm t[static 1], const Lstr x, Lterm s[static 1]) {
     switch(t->tag) {
         case Lvartag: {
             if (lam_str_eq(t->var.name, x)) { 
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 lam_free(t);
                 return s;
             }
             else {
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 lam_free(s);
                 return t;
             }
@@ -113,43 +112,43 @@ Lterm* lam_red_subst(Lterm t[static 1], const Lstr x, Lterm s[static 1]) {
                 Lterm* b = lam_red_subst(t->abs.body, lam_lstr_dup(x), s);
                 if (lam_invalid_term(b)) {
                     puts("DEBUG: invalid term"); 
-                    lam_free(t);
-                    free((void*)x.s);
+                    lam_free_term(t);
+                    lam_free((void*)x.s);
                     return b;
                 }
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 return b;
             } else { //x is captured by \x
-                free((void*)x.s);
+                lam_free((void*)x.s);
                 return t;
             }
         }
         case Lapptag: {
             Lterm* fred = lam_red_subst(t->app.fun, lam_lstr_dup(x), s);
             if (lam_invalid_term(fred)) {
-                free((void*)x.s);
-                lam_free(t);
+                lam_free((void*)x.s);
+                lam_free_term(t);
                 return fred;
             }
             t->app.fun = fred;
             Lterm* s_clone = lam_clone(s);
             if (lam_invalid_term(s)) {
-                free((void*)x.s);
-                lam_free(t);
+                lam_free((void*)x.s);
+                lam_free_term(t);
                 return 0x0;
             }
             Lterm* pred = lam_red_subst(t->app.param, x, s_clone);
             if (lam_invalid_term(pred)) {
-                free((void*)x.s);
-                lam_free(t);
+                lam_free((void*)x.s);
+                lam_free_term(t);
                 return pred;
             }
             t->app.param = pred;
-            free((void*)x.s);
+            lam_free((void*)x.s);
             return t;
         }
         default: {
-            lam_free(t);
+            lam_free_term(t);
              return lam_internal_error();
         };
     }
@@ -179,15 +178,15 @@ Lterm* lam_reduce_step(Lterm* t) {
             if (lam_normal_form(t->app.fun) && lam_normal_form(t->app.param)) {
                 if (t->app.fun->tag == Labstag) {
                     Lterm* red = lam_reduce_abs(t->app.fun->abs.body, t->app.fun->abs.vname, t->app.param);
-                    free(t->app.fun);
-                    free(t);
+                    lam_free(t->app.fun);
+                    lam_free(t);
                     return red;
                 }
                 return t;
             } else if (lam_normal_form(t->app.fun)) {
                 Lterm* p = lam_reduce_step(t->app.param);
                 if (lam_invalid_term(p)) {
-                    lam_free(t);
+                    lam_free_term(t);
                     return p;
                 }
                 t->app.param = p;
@@ -195,7 +194,7 @@ Lterm* lam_reduce_step(Lterm* t) {
             } else {
                 Lterm* f = lam_reduce_step(t->app.fun);
                 if (lam_invalid_term(f)) {
-                    lam_free(t);
+                    lam_free_term(t);
                     return f;
                 }
                 t->app.fun = f;
@@ -221,6 +220,7 @@ void lam_term_log(const Lterm* t, unsigned nreds) {
 }
 
 Lterm* lam_reduce(Lterm* t) {
+    if (lam_invalid_term(t)) { return t; }
     unsigned max_reductions = 1000;
     unsigned nreds = 0;
 

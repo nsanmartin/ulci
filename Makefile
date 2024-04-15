@@ -101,6 +101,12 @@ valgrind-t:
 valgrind-var:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter samples/var
 
+valgrind-app:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter samples/app
+
+valgrind-abs:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter samples/abs
+
 valgrind-foo:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter ~/ulci/foo
 

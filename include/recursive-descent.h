@@ -59,7 +59,7 @@ static inline bool lam_stmt_is_end(LamTokenTag t) {
 }
 
 static inline Lstr lam_parse_tk_dup_kw(RecDescCtx* ctx) {
-    return lam_strndup(ctx->buf.s, ctx->buf.len);
+    return lam_lstrndup(ctx->buf.s, ctx->buf.len);
 }
 
 static inline Lstr lam_parse_tk_kw_view(RecDescCtx* ctx) {

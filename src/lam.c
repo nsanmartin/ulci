@@ -1,5 +1,4 @@
 #define _GNU_SOURCE
-//#include <gc/gc.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -7,22 +6,6 @@
 #include "mem.h"
 #include <reduce.h>
 #include <recursive-descent.h>
-
-
-/// //// Lterm values that denote errors:
-/// ///
-/// const Lterm* LamInternalError = &(Lterm){
-///     .var={.name={.s="LamInternalError"}}
-/// };
-/// // parse error
-/// const Lterm* NotParse = &(Lterm){.var={.name={.s="NotParse"}}};
-/// const Lterm* SyntaxError = &(Lterm){.var={.name={.s="SyntaxError"}}};
-/// // eval errors
-/// const Lterm* NotReducing = &(Lterm){.var={.name={.s="NotReducing"}}};
-/// const Lterm* TooManyReductions = &(Lterm){
-///     .var={.name={.s="TooManyReductions"}}
-/// };
-/// ////
 
 
 long used_fresh_vars = 0;
@@ -65,7 +48,7 @@ void freeLtermList(LtermList* ls) {
         LtermList* tmp = ls;
         ls = ls->next;
         lam_free_term((Lterm*)tmp->t);
-        free((void*)tmp);
+        lam_free((void*)tmp);
     }
 }
 
@@ -159,7 +142,7 @@ Lterm* lam_new_var(Lstr n) {
     }
     Lterm* rv = lam_malloc(sizeof (*rv));
     if (!rv) {
-        free((void*)m.s);
+        lam_free((void*)m.s);
         return 0x0;
     }
     *rv = (Lterm) { .tag=Lvartag, . var = (Lvar) { .name = m }};
@@ -191,7 +174,7 @@ Lterm* lam_new_abs(Lstr vn, const Lterm body[static 1]) {
     Lterm* rv = lam_malloc(sizeof (*rv));
     if (!rv) {
         lam_free_term(b);
-        free((void*)vname.s);
+        lam_free((void*)vname.s);
         return 0x0;
     }
     *rv = (Lterm) { .tag = Labstag, .abs= (Labs) {.vname=vname, .body=b}};
@@ -340,7 +323,7 @@ int lam_rename_var_in_place(Lterm t[static 1], Lstr varname, Lstr newname) {
     switch(t->tag) {
         case Lvartag: {
             if (lam_str_eq(varname, t->var.name)) {
-                free((void*)t->var.name.s);
+                lam_free((void*)t->var.name.s);
                 t->var.name = lam_lstr_dup(newname);
                 if (lam_str_null(t->var.name)) {
                     return -1;
@@ -350,7 +333,7 @@ int lam_rename_var_in_place(Lterm t[static 1], Lstr varname, Lstr newname) {
         }
         case Labstag: {
             if (lam_str_eq(t->abs.vname, varname)) {
-                free((void*)t->abs.vname.s);
+                lam_free((void*)t->abs.vname.s);
                 t->abs.vname = lam_lstr_dup(newname);
                 if (lam_str_null(t->abs.vname)) {
                     return -1;

@@ -51,10 +51,14 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
     if (!ctx) return lam_internal_error();
     if (lam_parse_tk_next_match_or_unget(ctx, LLparen)) {
         Lterm* expr = lam_parse_expression(ctx);
-        if (lam_parse_term_failed(expr)) { return lam_syntax_error(); }
+        if (lam_parse_term_failed(expr)) {
+            lam_free_term(expr);
+            return lam_syntax_error();
+        }
         if (lam_parse_tk_next_match_or_unget(ctx, LRparen)) {
             return expr; 
         }
+        lam_free_term(expr);
         return lam_syntax_error();
     } else if (lam_parse_tk_next_match_or_unget(ctx, LVar)) {
         return lam_var(lam_parse_tk_dup_kw(ctx));
@@ -73,7 +77,10 @@ Lterm* lam_parse_not_lambda(RecDescCtx* ctx) {
     }
     for(;;) {
         Lterm* p = lam_parse_neither_lnorapp(ctx);
-        if (lam_is_not_parse(p)) { break; }
+        if (lam_is_not_parse(p)) {
+            lam_free_term(p);
+            break;
+        }
         if (lam_parse_term_failed(p)) { return p; }
         app = lam_app(app, p);
     }
@@ -105,6 +112,7 @@ Lterm* lam_parse_expression(RecDescCtx* ctx) {
     Lterm* t =  lam_parse_lambda(ctx);
     if (lam_parse_term_exception(t)) { return t; }
     if (!lam_is_not_parse(t)) { return t; }
+    lam_free_term(t);
     return lam_parse_not_lambda(ctx);
 }
 
@@ -118,16 +126,16 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     Lstr v = lam_parse_tk_dup_kw(ctx);
     if (lam_str_null(v)) { return 0x0; }
     if (!lam_parse_tk_next_match_or_unget(ctx, LEquals)) {
-        free((void*)v.s);
+        lam_free((void*)v.s);
         return lam_syntax_error();
     }
     Lterm* expr = lam_parse_expression(ctx);
     if (lam_parse_term_failed(expr)) {
-        free((void*)v.s);
+        lam_free((void*)v.s);
         return lam_syntax_error();
     }
     if (!lam_parse_tk_next_is_end(ctx)) {
-        free((void*)v.s);
+        lam_free((void*)v.s);
         lam_free_term(expr);
         lam_parse_tk_unget(ctx);
         return lam_syntax_error();
@@ -135,7 +143,7 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
 
     int err = lam_str_name_insert(v, (Lterm*)expr);
     if (err) {
-        free((void*)v.s);
+        lam_free((void*)v.s);
         lam_free_term(expr);
     }
     return lam_clone(expr);
@@ -167,7 +175,7 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
             lam_parse_apply_callbacks(on_stmt_read, &set_expr);
             continue;
         }
-
+        lam_free_term(set_expr);
 
         Lterm* t = lam_parse_expression(&ctx);
         if (lam_is_syntax_error(t)) {
