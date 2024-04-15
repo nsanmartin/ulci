@@ -5,13 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MEM_SZ 200
-void* lam_memory[MEM_SZ] = {0};
-int lam_free_mem_ix = 0;
-
-#define MAX_ALLOC 1000000
-uintptr_t allocated[MAX_ALLOC] = {0};
-uintptr_t deallocated[MAX_ALLOC] = {0};
+#define MEM_SZ 1000000
+uintptr_t allocated[MEM_SZ] = {0};
+uintptr_t deallocated[MEM_SZ] = {0};
 size_t last_alloc = 0;
 size_t last_dealloc = 0;
 
@@ -23,69 +19,64 @@ void print_mem_summary() {
 }
 
 void* lam_malloc(size_t size) {
-#ifdef TESTMEM
-    if (lam_free_mem_ix < MEM_SZ) {
-        void* rv = malloc(size);
-        if (!rv) {
-            perror("lam_malloc: not enough memory");
-            abort();
-        }
-        ++lam_free_mem_ix;
-        return rv;
-    } else {
-        perror("lam_malloc: MEM_SZ reached");
-        abort();
-    }
-#else
+#ifdef MEM_TEST
     void* r = malloc(size);
-    assert(last_alloc < MAX_ALLOC);
+    assert(last_alloc < MEM_SZ);
     allocated[last_alloc++] = (uintptr_t)r;
     return r;
+#else
+    return malloc(size);
 #endif
 }
 
 void* lam_calloc(size_t nmemb, size_t size) {
+#ifdef MEM_TEST
     void* r = calloc(nmemb, size);
-    assert(last_alloc < MAX_ALLOC);
+    assert(last_alloc < MEM_SZ);
     allocated[last_alloc++] = (uintptr_t)r;
     return r;
+#else
+    return calloc(nmemb, size);
+#endif
 }
 
-void lam_free_error() {
-    puts("error freind ptr ");
-}
+void lam_free_error() { puts("error freind ptr "); }
 
 void lam_free(void* ptr) {
-    assert(last_dealloc < MAX_ALLOC);
+#ifdef MEM_TEST
+    assert(last_dealloc < MEM_SZ);
     uintptr_t to_free = (uintptr_t)ptr;
     deallocated[last_dealloc++] = to_free;
-    free(ptr);
     for (size_t i = 0; i < last_alloc; ++i) {
         if (to_free == allocated[i]) { return; }
     }
     lam_free_error();
+#else
+    free(ptr);
+#endif
 }
 
 char* lam_strdup(const char* s) {
-    assert(last_alloc < MAX_ALLOC);
+#ifdef MEM_TEST
+    assert(last_alloc < MEM_SZ);
     char* r = strdup(s);
     allocated[last_alloc++] = (uintptr_t)r;
     return r;
-}
-
-void lam_free_mem(void) {
-#ifdef TESTMEM
-    printf("malloc calls: %d\n", lam_free_mem_ix);
-    while(--lam_free_mem_ix >= 0) {
-        free(lam_memory[lam_free_mem_ix]);
-    }
+#else
+    return strdup(s);
 #endif
 }
 
 char* lam_strndup(const char* s, size_t n) {
-    assert(last_alloc < MAX_ALLOC);
+#ifdef MEM_TEST
+    assert(last_alloc < MEM_SZ);
     char* r = strndup(s,n);
     allocated[last_alloc++] = (uintptr_t)r;
     return r;
+#else
+    return strndup(s,n);
+#endif
 }
+
+void lam_free_mem(void) { }
 
