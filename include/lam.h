@@ -135,6 +135,8 @@ inline static bool lam_valid_tag(const Lterm t[static 1]) {
 }
 
 // Utils
+void lam_pcb_print(Lterm* tptr[static 1], /*Lterm** */void* rvp);
+void lam_pcb_reduce(Lterm* tptr[static 1], /*Lterm** */void* rvp);
 void free_term_callback(Lterm* t[static 1], void* ignore);
 void reduce_ret_callback(Lterm* t[static 1], /*Lterm*/void* rv);
 void reduce_print_free_callback(Lterm* t[static 1], void* ignore);

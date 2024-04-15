@@ -29,12 +29,16 @@ FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
 PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c 
 PARSER_SRCS=$(wildcard $(PARSER_DIR)/*.c)
 
-all: build/interpreter build/lexer build/parser run-tests
+all: build/filter_ok build/interpreter build/lexer build/parser run-tests
 
 run-tests: $(BUILD)/utests $(BUILD)/itests
 	$(BUILD)/utests
 	$(BUILD)/itests
 
+
+$(BUILD)/filter_ok: $(LAM_OBJ) $(GCOBJ)
+	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \
+		-o $@ parser/filter_ok.c $^ -lreadline
 
 $(BUILD)/interpreter: $(LAM_OBJ) $(GCOBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \

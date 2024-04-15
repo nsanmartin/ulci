@@ -648,6 +648,7 @@ bool lam_normal_form(const Lterm t[static 1]) {
  */
 
 // Callbacks
+// pcb (Parse CalBacks)
 
 void lam_pcb_id(Lterm* tptr[static 1], /*(Lterm**)*/void* rvp) { *(Lterm**)rvp = *tptr; }
 
@@ -657,8 +658,15 @@ void free_term_callback(Lterm* tptr[static 1], void* ignore) {
 }
 
 void lam_pcb_reduce(Lterm* tptr[static 1], /*Lterm** */void* rvp) {
+    (void)rvp;
     *tptr = lam_reduce(*tptr);
-    *(Lterm**)rvp = *tptr;
+}
+
+void lam_pcb_print(Lterm* tptr[static 1], /*Lterm** */void* rvp) {
+    (void)rvp;
+    void (*print_fn)(const Lterm t[static 1]) = lam_print_term_less_paren;
+    print_fn(*tptr);
+    puts("");
 }
 
 void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
