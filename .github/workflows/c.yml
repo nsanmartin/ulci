@@ -13,10 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: configure
-      run: ./configure
     - name: make build dir
       run: mkdir build
+    - name: submodules
+      run: git submodule update --init --recursive
     - name: make 
-      run: make 
+      run: make build/interpreter build/itests
+    - name: itests
+      run: ./build/itests
     
