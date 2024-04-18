@@ -36,6 +36,7 @@ int interactive_lexer(void) {
             scan_eol();
             add_history(line);
         }
+        free(line);
     }
     return 0;
 }

@@ -37,6 +37,10 @@ $(BUILD)/filter_ok: $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \
 		-o $@ parser/filter_ok.c $^ -lreadline
 
+$(BUILD)/ulci-no-readline: $(LAM_OBJ)
+	$(CC) -DNO_READLINE $(STRICT_CFLAGS) $(CFLAGS) \
+		-o $@ parser/ulci.c $^ -lreadline
+
 $(BUILD)/ulci: $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \
 		-o $@ parser/ulci.c $^ -lreadline

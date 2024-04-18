@@ -1,7 +1,12 @@
 #include <unistd.h>
 #include <stdio.h>
+
+#ifndef NO_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
+#else
+#include <lam-readline.h>
+#endif
 
 #include <lexer.h>
 #include <eval.h>
@@ -18,17 +23,14 @@ int interactive_interpreter(StmtReadCallback* callback) {
             lam_parse_stmts(callback);
             add_history(line);
         }
+        free(line);
     }
     return 0;
 }
 
 
 int main (int argc, char* argv[]) {
-    StmtReadCallback callback[3] = {
-        { .callback=reduce_print_free_callback },
-        //{ .callback=free_term_callback },
-        {0}
-    };
+    StmtReadCallback callback[2] = { { .callback=reduce_print_free_callback }, {0} };
     if(initialize_symbol_table()) {
         fprintf(stderr, "Error: not memory to initialize parser\n");
         return -1;
