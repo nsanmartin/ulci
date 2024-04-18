@@ -53,7 +53,7 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
         Lterm* expr = lam_parse_expression(ctx);
         if (lam_parse_term_failed(expr)) {
             lam_free_term(expr);
-            return lam_syntax_error();
+            return expr; 
         }
         if (lam_parse_tk_next_match_or_unget(ctx, LRparen)) {
             return expr; 
@@ -71,20 +71,19 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
 Lterm* lam_parse_not_lambda(RecDescCtx* ctx) {
     if (!ctx) return lam_internal_error();
     Lterm* app = lam_parse_neither_lnorapp(ctx);
-    if (lam_parse_term_failed(app)) {
-        //lam_free_term(app); // if failed should have been freed already
-        return lam_syntax_error();
-    }
+    if (lam_parse_term_failed(app)) { return app; }
     for(;;) {
         Lterm* p = lam_parse_neither_lnorapp(ctx);
         if (lam_is_not_parse(p)) {
             lam_free_term(p);
-            break;
+            return app;
         }
-        if (lam_parse_term_failed(p)) { return p; }
+        if (lam_parse_term_failed(p)) {
+            lam_free_term(app);
+            return p;
+        }
         app = lam_app(app, p);
     }
-    return app;
 }
 
 Lterm* lam_parse_lambda(RecDescCtx* ctx) {
@@ -101,10 +100,9 @@ Lterm* lam_parse_lambda(RecDescCtx* ctx) {
     Lterm* expr = lam_parse_expression(ctx);
     if (lam_parse_term_failed(expr)) {
         lam_free((void*)v.s);
-        return lam_syntax_error();
+        return expr;
     }
     return lam_abs(v, expr);
-
 }
 
 Lterm* lam_parse_expression(RecDescCtx* ctx) {
@@ -132,7 +130,7 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     Lterm* expr = lam_parse_expression(ctx);
     if (lam_parse_term_failed(expr)) {
         lam_free((void*)v.s);
-        return lam_syntax_error();
+        return expr;
     }
     if (!lam_parse_tk_next_is_end(ctx)) {
         lam_free((void*)v.s);
@@ -145,6 +143,7 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     if (err) {
         lam_free((void*)v.s);
         lam_free_term(expr);
+        return lam_internal_error();
     }
     return lam_clone(expr);
 }
@@ -163,34 +162,14 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
         if (lam_parse_tk_next_is_end(&ctx)) { continue; }
         lam_parse_tk_unget(&ctx);
 
-        Lterm* set_expr = lam_parse_stmt_set(&ctx);
-        if (lam_is_syntax_error(set_expr)) {
-            puts("syntax error");
-            continue;
-        } else if (lam_is_internal_error(set_expr)) {
-            puts("lam internal error, aborting.");
-            exit(EXIT_FAILURE);
-        } else if (!lam_is_not_parse(set_expr)) {
-            //on_stmt_read->callback((Lterm*)set_expr, on_stmt_read->acum);
-            lam_parse_apply_callbacks(on_stmt_read, &set_expr);
-            continue;
-        }
-        lam_free_term(set_expr);
+        Lterm* t = lam_parse_stmt_set(&ctx);
 
-        Lterm* t = lam_parse_expression(&ctx);
-        if (lam_is_syntax_error(t)) {
-            puts("syntax error");
-        } else if (lam_is_internal_error(t)) {
-            puts("lam internal error, aborting.");
-            exit(EXIT_FAILURE);
-        } else if (lam_is_not_parse(t)) {
-            puts("lam internal error: should not happen?");
-        } else if (!lam_parse_tk_next_is_end(&ctx)) {
-            puts("Error parsing expression");
-        } else {
-            //on_stmt_read->callback((Lterm*)t, on_stmt_read->acum);
-            lam_parse_apply_callbacks(on_stmt_read, &t);
-        }
+        if (lam_is_not_parse(t)) {
+            lam_free_term(t);
+            t = lam_parse_expression(&ctx);
+        } 
+
+        lam_parse_apply_callbacks(on_stmt_read, &t);
     }
 }
 

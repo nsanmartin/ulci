@@ -183,12 +183,13 @@ Lterm* lam_new_abs(Lstr vn, const Lterm body[static 1]) {
 
 Lterm* lam_abs(Lstr vn, Lterm body[static 1]) {
     if (lam_str_null(vn)) {
-        lam_free_term((void*)body);
+        lam_free_term(body);
         return 0x0;
     } 
     Lterm* rv = lam_malloc(sizeof (*rv));
     if (!rv) {
-        lam_free_term((void*)body);
+        lam_free_term(body);
+        lam_free((void*)vn.s);
         return 0x0;
     }
     *rv = (Lterm) { .tag = Labstag, .abs= (Labs) {.vname=vn, .body=body}};
@@ -659,14 +660,29 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
     Lterm* t = lam_reduce(*tptr);
     *tptr = t;
 
-    if (!t || t->tag == Lerrtag) {
-        if (t && t->err.tag == LNotReducingTag) {
-            printf("eval error: term is not reducing\n");
-        } else if (t && t->err.tag == LTooManyReductionsTag) {
-            puts("eval error: too many reductions");
-        }
-        else {//(!t || t->err.tag == LamInternalError) {
-            puts("Lam internal error");
+    if (!t) { puts("Lam internal error: unexpected NULL term, aborting."); exit(EXIT_FAILURE); }
+    if (t->tag == Lerrtag) {
+        switch (t->err.tag) {
+            case LInternalErrorTag: {
+                printf("Lam internal error");
+                break;
+            }
+            case LNotParseTag: {
+                printf("Lam internal error: unexpected not parse");
+                break;
+            }
+            case LSyntaxErrorTag: {
+                puts("Syntax error");
+                break;
+            }
+            case LNotReducingTag: {
+                puts("eval error: term is not reducing");
+                break;
+            }
+            case LTooManyReductionsTag: {
+                puts("eval error: too many reductions");
+                break;
+            }
         }
     } else {
         on_parse(t);
