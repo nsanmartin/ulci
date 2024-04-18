@@ -11,7 +11,7 @@ uintptr_t deallocated[MEM_SZ] = {0};
 size_t last_alloc = 0;
 size_t last_dealloc = 0;
 
-void print_mem_summary() {
+void print_mem_summary(void) {
     puts("Allocated:");
     for (size_t i = 0; i < last_alloc; ++i) { printf("  %lx\n", allocated[i]); }
     puts("Deallocated:");
@@ -40,7 +40,7 @@ void* lam_calloc(size_t nmemb, size_t size) {
 #endif
 }
 
-void lam_free_error() { puts("error freind ptr "); }
+void lam_free_error(void) { puts("error freind ptr "); }
 
 void lam_free(void* ptr) {
 #ifdef MEM_TEST

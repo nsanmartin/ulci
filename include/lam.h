@@ -75,11 +75,11 @@ unsigned lam_term_height(const Lterm* t);
 Lterm* lam_var(Lstr n);
 Lterm* lam_abs(Lstr vn, Lterm body[static 1]);
 Lterm* lam_app(Lterm fun[static 1], Lterm param[static 1]);
-Lterm* lam_not_parse();
-Lterm* lam_syntax_error();
-Lterm* lam_internal_error();
-Lterm* lam_not_reducing();
-Lterm* lam_too_many_reductions();
+Lterm* lam_not_parse(void);
+Lterm* lam_syntax_error(void);
+Lterm* lam_internal_error(void);
+Lterm* lam_not_reducing(void);
+Lterm* lam_too_many_reductions(void);
 
 Lstr lam_get_form_name(const Lterm t[static 1]) ;
 void lam_free_term(Lterm* t) ;

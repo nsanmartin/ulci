@@ -17,6 +17,6 @@ void lam_free(void* ptr);
 //static inline char* lam_strdup(const char* s) { return strdup(s); }
 char* lam_strdup(const char* s);
 
-void print_mem_summary() ;
+void print_mem_summary(void) ;
 #endif
 

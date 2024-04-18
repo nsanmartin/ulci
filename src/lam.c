@@ -98,7 +98,7 @@ unsigned lam_term_height(const Lterm* t) {
  * Factory methods
  **/
 
-Lterm* lam_not_parse() {
+Lterm* lam_not_parse(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
     *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotParseTag, .t=0x0 }};
@@ -106,28 +106,28 @@ Lterm* lam_not_parse() {
 }
 
 //TODO: store info?
-Lterm* lam_syntax_error() {
+Lterm* lam_syntax_error(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
     *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LSyntaxErrorTag, .t=0x0 }};
     return rv;
 }
 
-Lterm* lam_internal_error() {
+Lterm* lam_internal_error(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
     *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LInternalErrorTag, .t=0x0 }};
     return rv;
 }
 
-Lterm* lam_not_reducing() {
+Lterm* lam_not_reducing(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
     *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotReducingTag, .t=0x0 }};
     return rv;
 }
 
-Lterm* lam_too_many_reductions() {
+Lterm* lam_too_many_reductions(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
     *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LTooManyReductionsTag, .t=0x0 }};

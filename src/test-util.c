@@ -14,7 +14,7 @@ LtermList* stmts_str_to_evaluated_lst(const char* s) {
     return acum.first;
 }
 
-LstrList* newLstrListOrFail() {
+LstrList* newLstrListOrFail(void) {
     LstrList* rv = lam_malloc(sizeof(LstrList));
     if (!rv) { puts("Mem error"); exit(EXIT_FAILURE); }
     *rv = (LstrList){0};

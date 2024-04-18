@@ -12,7 +12,7 @@ int initialize_symbol_table(void) {
     return stringTableInitWithSize(&_symbols, 100, 17);
 }
 
-void free_symbol_table() {
+void free_symbol_table(void) {
     if (_symbols.table) {
         for (unsigned long i = 0; i < _symbols.size; ++i) {
             Entry* e = _symbols.table + i;

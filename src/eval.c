@@ -80,15 +80,15 @@ void eval_print(const Lterm t[static 1], void* ignore) {
 
     EvalCtx ctx = {.len0=lam_term_len(t)};
     const Lterm* v = lam_eval_with_ctx(t, &ctx);
-    if (lam_not_reducing(v)) {
+    if (lam_not_reducing()) {
         printf("eval error: %s\nterm: '", "term is not reducing");
         on_parse(t);
         puts("'");
-    } else if (lam_too_many_reductions(v)) {
+    } else if (lam_too_many_reductions()) {
         printf("eval error: %s\nterm: '", "eval stack too large");
         on_parse(t);
         puts("'");
-    } else if (lam_internal_error(v)) {
+    } else if (lam_internal_error()) {
         puts("Lam eval internal error");
     } else {
         on_parse(v);

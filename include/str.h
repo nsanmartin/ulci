@@ -13,7 +13,7 @@ char* lam_strndup(const char* s, size_t n);
 
 static inline void lam_str_fwrite(const Lstr s) { fwrite(s.s, 1, s.len, stdout); }
 
-static inline Lstr LEMPTY_STR() {
+static inline Lstr LEMPTY_STR(void) {
     return  (Lstr){.s="",.len=0};
 }
 
