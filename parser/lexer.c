@@ -4,10 +4,10 @@
 #include <readline/history.h>
 
 #include <lexer.h>
-#include <parser-lam-reader.h>
+//#include <parser-lam-reader.h>
 #include <symbols.h>
 
-void scan_eol() {
+void scan_eol(void) {
     LamTokenTag tk = LamTokenTagsLen;
     for(; tk != LEof;) {
         LamKeywordBuf buf = {0};
@@ -28,7 +28,7 @@ void scan_eol() {
     puts("");
 }
 
-int interactive_lexer() {
+int interactive_lexer(void) {
     char* line = NULL;
     while ((line = readline("> "))) {
         if (line && *line) {

@@ -8,9 +8,6 @@ STRICT_CFLAGS:= -Werror
 
 BUILD=./build
 
-GC:=bdwgc/extra/gc.c
-GCOBJ:=$(BUILD)/gc.o
-
 LAM_OBJDIR=build
 LAM_SRCDIR=./src
 LAM_INCLUDE=include
@@ -36,18 +33,18 @@ run-tests: $(BUILD)/utests $(BUILD)/itests
 	$(BUILD)/itests
 
 
-$(BUILD)/filter_ok: $(LAM_OBJ) $(GCOBJ)
+$(BUILD)/filter_ok: $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \
 		-o $@ parser/filter_ok.c $^ -lreadline
 
-$(BUILD)/interpreter: $(LAM_OBJ) $(GCOBJ)
+$(BUILD)/interpreter: $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \
 		-o $@ parser/interpreter.c $^ -lreadline
 
-$(BUILD)/utests: utests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_UTIL)
+$(BUILD)/utests: utests.c $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h  -I$(PARSER_INCLUDE) -o $@ $^ 
 
-$(BUILD)/itests: itests.c $(BISON_SRC) $(LAM_OBJ) $(GCOBJ) $(FLEX_OBJ) $(PARSER_UTIL)
+$(BUILD)/itests: itests.c $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h -I$(PARSER_INCLUDE) -o $@ $^ 
 
 $(LAM_OBJDIR)/%.o: $(LAM_SRCDIR)/%.c $(LAM_HEADERS)
@@ -58,14 +55,14 @@ $(BUILD)/parser: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
 		-o $@ $(PARSER_DIR)/parser.c \
 		$^ -lfl -lc -lreadline
 
-$(BUILD)/lexer: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
-	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) \
+$(BUILD)/lexer: $(LAM_OBJ)
+	$(CC) $(CFLAGS)  \
 		-o $@ $(PARSER_DIR)/lexer.c \
-		$^ -lfl -lc -lreadline
+		$^ -lreadline
 
 
-$(GCOBJ):
-	$(CC) -c -o $(BUILD)/gc.o bdwgc/extra/gc.c -I bdwgc/include/
+#$(GCOBJ):
+#	$(CC) -c -o $(BUILD)/gc.o bdwgc/extra/gc.c -I bdwgc/include/
 
 $(BUILD)/lex.yy.c: $(PARSER_DIR)/lexer.l $(BUILD)/parser.tab.c 
 	flex -o $@ $<
