@@ -7,7 +7,7 @@
 #include <symbols.h>
 
 
-int interactive() {
+int interactive(void) {
     char* line = NULL;
     while ((line = readline("> "))) {
         if (line && *line) {

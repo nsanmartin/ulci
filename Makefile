@@ -26,7 +26,7 @@ FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
 PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c 
 PARSER_SRCS=$(wildcard $(PARSER_DIR)/*.c)
 
-all: build/filter_ok build/interpreter build/lexer build/parser run-tests
+all: build/filter_ok build/ulci build/lexer build/bison-generated run-tests
 
 run-tests: $(BUILD)/utests $(BUILD)/itests
 	$(BUILD)/utests
@@ -37,9 +37,9 @@ $(BUILD)/filter_ok: $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \
 		-o $@ parser/filter_ok.c $^ -lreadline
 
-$(BUILD)/interpreter: $(LAM_OBJ)
+$(BUILD)/ulci: $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) \
-		-o $@ parser/interpreter.c $^ -lreadline
+		-o $@ parser/ulci.c $^ -lreadline
 
 $(BUILD)/utests: utests.c $(LAM_OBJ)
 	$(CC) $(STRICT_CFLAGS) $(CFLAGS) -Iutest.h  -I$(PARSER_INCLUDE) -o $@ $^ 
@@ -50,19 +50,18 @@ $(BUILD)/itests: itests.c $(LAM_OBJ)
 $(LAM_OBJDIR)/%.o: $(LAM_SRCDIR)/%.c $(LAM_HEADERS)
 	$(CC) $(LAMF) $(STRICT_CFLAGS) $(CFLAGS) -c -o $@  $<
 
-$(BUILD)/parser: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ) $(GCOBJ)
-	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) \
-		-o $@ $(PARSER_DIR)/parser.c \
-		$^ -lfl -lc -lreadline
-
 $(BUILD)/lexer: $(LAM_OBJ)
 	$(CC) $(CFLAGS)  \
 		-o $@ $(PARSER_DIR)/lexer.c \
 		$^ -lreadline
 
 
-#$(GCOBJ):
-#	$(CC) -c -o $(BUILD)/gc.o bdwgc/extra/gc.c -I bdwgc/include/
+####
+## FLEX BISON
+$(BUILD)/bison-generated: $(FLEX_OBJ) $(BISON_OBJ) $(PARSER_UTIL) $(LAM_OBJ)
+	$(CC) $(CFLAGS) -I$(PARSER_INCLUDE) \
+		-o $@ $(PARSER_DIR)/bison-generated.c \
+		$^ -lfl -lc -lreadline
 
 $(BUILD)/lex.yy.c: $(PARSER_DIR)/lexer.l $(BUILD)/parser.tab.c 
 	flex -o $@ $<
@@ -92,20 +91,23 @@ bison-no-warnings:
 	bison -t -d -o $(BISON_SRC) $(PARSER_DIR)/parser.y
 
 
+####
+## Valgrind
+
 valgrind-t:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter $T
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci $T
 
 valgrind-var:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter samples/var
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci samples/var
 
 valgrind-app:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter samples/app
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci samples/app
 
 valgrind-abs:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter samples/abs
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci samples/abs
 
 valgrind-foo:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter ~/ulci/foo
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci ~/ulci/foo
 
 valgrind-samples:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/interpreter ~/ulci/samples
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci ~/ulci/samples
