@@ -5,17 +5,45 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MEM_TEST
+
 #define MEM_SZ 1000000
 uintptr_t allocated[MEM_SZ] = {0};
 uintptr_t deallocated[MEM_SZ] = {0};
 size_t last_alloc = 0;
 size_t last_dealloc = 0;
 
+void check_all_freed() {
+    for (size_t i = 0; i < last_alloc; ++i) {
+        uintptr_t allocd = allocated[i];
+
+        size_t j = 0; 
+        for (; j < last_dealloc; ++j) {
+            uintptr_t deallocd =  deallocated[j];
+            if (allocd == deallocd) {
+                printf("%lx ok\n", allocd);
+                break;
+            }
+        }
+        if (j == last_dealloc) {
+            printf("%lx Not Freed!!\n", allocd);
+        }
+    }
+}
+
+void clear_allocated() {
+    for (size_t i = 0; i < last_alloc; ++i) { allocated[i] = 0; }
+    for (size_t i = 0; i < last_dealloc; ++i) { deallocated[i] = 0; }
+}
+
 void print_mem_summary(void) {
+#ifdef MEM_TEST
     puts("Allocated:");
     for (size_t i = 0; i < last_alloc; ++i) { printf("  %lx\n", allocated[i]); }
     puts("Deallocated:");
     for (size_t i = 0; i < last_dealloc; ++i) { printf("  %lx\n", deallocated[i]); }
+    check_all_freed();
+#endif
 }
 
 void* lam_malloc(size_t size) {
@@ -51,9 +79,8 @@ void lam_free(void* ptr) {
         if (to_free == allocated[i]) { return; }
     }
     lam_free_error();
-#else
-    free(ptr);
 #endif
+    free(ptr);
 }
 
 char* lam_strdup(const char* s) {

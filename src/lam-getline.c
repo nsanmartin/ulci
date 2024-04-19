@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <mem.h>
+
+
 char* lam_readline (const char *prompt) {
     char *line = NULL;
     size_t len = 0;
@@ -9,7 +12,7 @@ char* lam_readline (const char *prompt) {
 
     printf("%s", prompt);
     read = getline(&line, &len, stdin);
-    if (read == -1) { free(line); line = 0x0; }
+    if (read == -1) { lam_free(line); line = 0x0; }
     return line;
 
 }

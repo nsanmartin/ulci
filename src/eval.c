@@ -102,7 +102,7 @@ void eval_to_list(Lterm* t[static 1], void* acum) {
     if (acum) {
 
         LtermList* node = lam_malloc(sizeof(LtermList));
-        if (!node) { puts("lam malloc error"); exit(EXIT_FAILURE); }
+        if (!node) { puts("lam_malloc error"); exit(EXIT_FAILURE); }
         *node = (LtermList){ .next=NULL,.t=v };
 
         ToListCallbackAcum* a = acum; 

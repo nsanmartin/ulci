@@ -14,7 +14,7 @@ int interactive(void) {
             eval_string(line, lam_term_to_str_less_paren);
             add_history(line);
         }
-        free(line);
+        lam_free(line);
     }
     return 0;
 }
