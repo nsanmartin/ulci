@@ -17,8 +17,14 @@ jobs:
       run: mkdir build
     - name: submodules
       run: git submodule update --init --recursive
-    - name: make 
-      run: make build/interpreter build/itests
+    - name: make lexer
+      run: make build/lexer
+    - name: make filter_ok
+      run: make build/filter_ok
+    - name: make ulci
+      run: make build/ulci
+    - name: utests
+      run: ./build/utests
     - name: itests
       run: ./build/itests
     
