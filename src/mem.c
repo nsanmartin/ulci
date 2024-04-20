@@ -21,7 +21,7 @@ size_t last_alloc = 0;
 size_t last_dealloc = 0;
 
 void push_allocd(uintptr_t p, const char* c, size_t i) {
-    printf("caller: %s, ptr: %lx\n", c, p);
+    //printf("caller: %s, ptr: %lx\n", c, p);
     allocated[i] = (PtrCaller){.p=p, c=c}; 
 }
 
@@ -33,7 +33,7 @@ void check_all_freed() {
         for (; j < last_dealloc; ++j) {
             uintptr_t deallocd =  deallocated[j].p;
             if (allocd.p == deallocd) {
-                printf("%lx ok\n", allocd.p);
+                //printf("%lx ok\n", allocd.p);
                 break;
             }
         }
@@ -51,10 +51,10 @@ void clear_allocated() {
 
 void print_mem_summary(void) {
 #ifdef MEM_TEST
-    puts("Allocated:");
-    for (size_t i = 0; i < last_alloc; ++i) { printf("  %lx\n", allocated[i]); }
-    puts("Deallocated:");
-    for (size_t i = 0; i < last_dealloc; ++i) { printf("  %lx\n", deallocated[i]); }
+    //puts("Allocated:");
+    //for (size_t i = 0; i < last_alloc; ++i) { printf("  %lx\n", allocated.p[i]); }
+    //puts("Deallocated:");
+    //for (size_t i = 0; i < last_dealloc; ++i) { printf("  %lx\n", deallocated.p[i]); }
     check_all_freed();
 #endif
 }

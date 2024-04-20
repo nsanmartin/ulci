@@ -177,6 +177,7 @@ Lterm* lam_reduce(Lterm* t) {
         }
     }
     if (nreds == max_reductions) {
+        lam_free_term(t);
         return lam_too_many_reductions();
     }
     return t;

@@ -13,10 +13,10 @@
 #define lam_strdup(STR) _lam_strdup(STR, __func__)
 #define lam_strndup(STR ,SZ) _lam_strndup(STR, SZ, __func__)
 #else
-#define lam_malloc(S) _lam_malloc(S, __func__)
-#define lam_calloc(NM, S) _lam_calloc(NM, S, __func__)
-#define lam_strdup(STR) _lam_strdup(STR, __func__)
-#define lam_strndup(STR ,SZ) _lam_strndup(STR, SZ, __func__)
+#define lam_malloc(S) _lam_malloc(S, "")
+#define lam_calloc(NM, S) _lam_calloc(NM, S, "")
+#define lam_strdup(STR) _lam_strdup(STR, "")
+#define lam_strndup(STR ,SZ) _lam_strndup(STR, SZ, "")
 #endif
 
 void* _lam_malloc(size_t size, const char* caller) ;

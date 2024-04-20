@@ -632,7 +632,7 @@ bool lam_normal_form(const Lterm t[static 1]) {
  */
 
 // Callbacks
-// pcb (Parse CalBacks)
+// pcb (Parse CallBacks)
 
 void lam_pcb_id(Lterm* tptr[static 1], /*(Lterm**)*/void* rvp) { *(Lterm**)rvp = *tptr; }
 
@@ -672,15 +672,15 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
                 break;
             }
             case LSyntaxErrorTag: {
-                puts("Syntax error");
+                printf("Syntax error");
                 break;
             }
             case LNotReducingTag: {
-                puts("eval error: term is not reducing");
+                printf("eval error: term is not reducing");
                 break;
             }
             case LTooManyReductionsTag: {
-                puts("eval error: too many reductions");
+                printf("eval error: too many reductions");
                 break;
             }
         }
