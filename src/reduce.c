@@ -1,8 +1,7 @@
 #include <limits.h>
 #include <lam.h>
 
-//TODOP: rename (Cf. l:61) to subst
-Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
+Lterm* lam_subst_inplace(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
     switch(body->tag) {
         case Lvartag: {
             if (lam_str_eq(body->var.name, x)) { 
@@ -38,7 +37,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
 					body->abs.vname = fresh_name;
                 }
 
-                Lterm* b = lam_reduce_abs(body->abs.body, lam_lstr_dup(x), lam_clone(s));
+                Lterm* b = lam_subst_inplace(body->abs.body, lam_lstr_dup(x), lam_clone(s));
                 if (lam_invalid_term(b)) {
                     puts("DEBUG: invalid term"); 
                     lam_free(s);
@@ -57,7 +56,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
             }
         }
         case Lapptag: {
-            Lterm* fred = lam_reduce_abs(body->app.fun, lam_lstr_dup(x), lam_clone(s));
+            Lterm* fred = lam_subst_inplace(body->app.fun, lam_lstr_dup(x), lam_clone(s));
             if (lam_invalid_term(fred)) {
                 lam_free((void*)x.s);
                 lam_free_term(s);
@@ -65,7 +64,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
                 return fred;
             }
             body->app.fun = fred;
-            Lterm* pred = lam_reduce_abs(body->app.param, x, s);
+            Lterm* pred = lam_subst_inplace(body->app.param, x, s);
             if (lam_invalid_term(pred)) {
                 lam_free((void*)x.s);
                 lam_free_term(body);
@@ -178,7 +177,7 @@ Lterm* lam_reduce_step(Lterm* t) {
         case Lapptag: {
             if (lam_normal_form(t->app.fun) && lam_normal_form(t->app.param)) {
                 if (t->app.fun->tag == Labstag) {
-                    Lterm* red = lam_reduce_abs(t->app.fun->abs.body, t->app.fun->abs.vname, t->app.param);
+                    Lterm* red = lam_subst_inplace(t->app.fun->abs.body, t->app.fun->abs.vname, t->app.param);
                     lam_free(t->app.fun);
                     lam_free(t);
                     return red;
