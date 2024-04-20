@@ -4,12 +4,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <mem.h>
+
 typedef struct { const char* s; size_t len; } Lstr;
 
 typedef struct LstrList { Lstr s; struct LstrList* next; } LstrList;
 
 void freeLstrList(LstrList* ls);
-char* lam_strndup(const char* s, size_t n);
+//char* lam_strndup(const char* s, size_t n);
 
 static inline void lam_str_fwrite(const Lstr s) { fwrite(s.s, 1, s.len, stdout); }
 
@@ -35,12 +37,12 @@ static inline Lstr lam_lstrndup(const char* s, size_t n) {
 }
 
 static inline Lstr lam_lstr_dup(Lstr s) {
-    return (Lstr){.s=lam_strndup(s.s, s.len), .len=s.len};
+    return (Lstr){.s=_lam_strndup(s.s, s.len, __func__), .len=s.len};
 }
 
 static inline Lstr lam_str_dup(const char* s) {
     size_t n = strlen(s);
-    return (Lstr){.s=lam_strndup(s,n), .len=n};
+    return (Lstr){.s=_lam_strndup(s,n, __func__), .len=n};
 }
 
 static inline bool lam_str_null(Lstr s) {

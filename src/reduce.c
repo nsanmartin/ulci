@@ -48,6 +48,7 @@ Lterm* lam_reduce_abs(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
                 }
                 body->abs.body = b;
                 lam_free((void*)x.s);
+                lam_free_term(s);
                 return body;
             } else { //x is captured by \x
                 lam_free((void*)x.s);
