@@ -10,11 +10,11 @@ void print_rand_expr(Termtag t) {
     bool subcase = rand() % 2 == 0;
     switch (t) {
         case Exptag: {
-            if (subcase) {
+            if (subcase && rand() % 2 == 0) {
+                print_rand_expr(Apptag);
+            } else {
                 printf("\\%c.", 's' + rand() % 8);
                 print_rand_expr(Exptag);
-            } else {
-                print_rand_expr(Apptag);
             }
             break;
         }
@@ -29,7 +29,7 @@ void print_rand_expr(Termtag t) {
         }
         case Atomtag: {
             if (subcase) {
-                printf(" %s ", "x");
+                printf(" %c ", 's' + rand() % 8);
             } else {
                 printf("(");
                 print_rand_expr(Exptag);
@@ -42,7 +42,10 @@ void print_rand_expr(Termtag t) {
 }
 
 int main(int argc, char* argv[]) {
-    srand(time(NULL)); // use current time as seed for random generator
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    unsigned seed = spec.tv_sec * 1000000000 + spec.tv_nsec;
+    srand(seed);
     print_rand_expr(Exptag);
     puts("");
 }
