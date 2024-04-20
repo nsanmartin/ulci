@@ -15,7 +15,7 @@ For example, after assigning `set id = \x.x`, `id id id x` evaluates to `x`.
 
 
 It interprets files containing lambda expressions (or assignments) evaluating
-each line (`./interpeter filename`). Run without parameters it starts an 
+each line (`./ulci filename`). Run without parameters it starts an 
 interactive shell.
 
 
