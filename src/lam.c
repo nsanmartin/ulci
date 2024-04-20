@@ -368,7 +368,7 @@ Lterm* lam_clone(const Lterm t[static 1]) {
 
 
 Lterm*
-lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
+lam_subst_dup(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
     switch(t->tag) {
         case Lvartag: {
             if (lam_str_eq(t->var.name, x)) {
@@ -390,7 +390,7 @@ lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
 					u->abs.vname = fresh_name;
                 }
 
-                Lterm* subst = lam_substitute(u->abs.body, x, s);
+                Lterm* subst = lam_subst_dup(u->abs.body, x, s);
                 if (!subst) { return 0x0; }
                 Lstr vn = u->abs.vname;
                 if (lam_str_null(vn)) { return 0x0; }
@@ -406,9 +406,9 @@ lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
             }
         }
         case Lapptag: {
-            Lterm* f_ = lam_substitute(t->app.fun, x, s);
+            Lterm* f_ = lam_subst_dup(t->app.fun, x, s);
             if (!f_) { return 0x0; }
-            Lterm* p_ = lam_substitute(t->app.param, x, s);
+            Lterm* p_ = lam_subst_dup(t->app.param, x, s);
             if (!p_) {  return 0x0; }
             Lterm* rv = lam_malloc(sizeof(*rv));
             if (!rv) {  return 0x0; }

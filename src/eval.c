@@ -6,7 +6,7 @@ Lterm* lam_eval_app(const Lapp app[static 1]) {
     Lterm* body = app->fun->abs.body;
     Lterm* s = app->param;
 
-    Lterm* r = lam_substitute(body, x, s);
+    Lterm* r = lam_subst_dup(body, x, s);
     return r;
 }
 

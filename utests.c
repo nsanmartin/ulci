@@ -240,22 +240,22 @@ UTEST(lam_clone, A) {
 UTEST(substitute, base_unchanged) {
     Lterm x = LVAR(X);
     Lterm s = LVAR(Y);
-    Lterm* unchanged_var = lam_substitute(&x, Y, &s);
+    Lterm* unchanged_var = lam_subst_dup(&x, Y, &s);
     ASSERT_TRUE(lam_are_identical(&x , unchanged_var));
 
     Lterm lx_x = LABS(X, LVAR(X));
-    Lterm* unchanged_abs = lam_substitute(&lx_x, Y, &s);
+    Lterm* unchanged_abs = lam_subst_dup(&lx_x, Y, &s);
     ASSERT_TRUE(lam_are_identical(&lx_x , unchanged_abs));
 
     Lterm lx_y = LABS(X, LVAR(Y));
     Lterm z = LVAR(Z);
-    Lterm* changed_abs = lam_substitute(&lx_y, Y, &z);
+    Lterm* changed_abs = lam_subst_dup(&lx_y, Y, &z);
     ASSERT_FALSE(lam_are_identical(&lx_y , changed_abs));
 
     Lterm xy = LAPP(LVAR(X), LVAR(Y));
-    Lterm* unchanged_app = lam_substitute(&xy, Y, &s);
+    Lterm* unchanged_app = lam_subst_dup(&xy, Y, &s);
     ASSERT_TRUE(lam_are_identical(&xy , unchanged_app));
-    Lterm* changed_app = lam_substitute(&xy, X, &s);
+    Lterm* changed_app = lam_subst_dup(&xy, X, &s);
     ASSERT_FALSE(lam_are_identical(&xy , changed_app));
 
 
@@ -266,7 +266,7 @@ UTEST(substitute, A) {
     Lterm x = LVAR(X);
     Lterm ly_x = LABS(Y, LVAR(X));
     Lterm lx_ly_x = LABS(X, ly_x);
-    Lterm* substituted = lam_substitute(&x, X, &lx_ly_x);
+    Lterm* substituted = lam_subst_dup(&x, X, &lx_ly_x);
     ASSERT_TRUE(lam_are_identical(substituted, &lx_ly_x));
 
 
@@ -274,10 +274,10 @@ UTEST(substitute, A) {
 
     Lterm lx_x = LABS(X, LVAR(X));
     Lterm applx_x__ly_x = LAPP(lx_x, ly_x);
-    Lterm* changed = lam_substitute(&applx_x__ly_x, X, &lx_ly_x);
+    Lterm* changed = lam_subst_dup(&applx_x__ly_x, X, &lx_ly_x);
     ASSERT_FALSE(lam_are_identical(&applx_x__ly_x, changed));
 
-    Lterm* unchanged = lam_substitute(&applx_x__ly_x, Y, &lx_ly_x);
+    Lterm* unchanged = lam_subst_dup(&applx_x__ly_x, Y, &lx_ly_x);
     ASSERT_TRUE(lam_are_identical(&applx_x__ly_x , unchanged));
 
 
@@ -290,7 +290,7 @@ UTEST(substitute, renaming_var) {
     Lterm xy = LAPP(LVAR(X),LVAR(Y));
 
     Lterm ly_x = LABS(Y, LVAR(X));
-    Lterm* substituted = lam_substitute(&ly_x, X, &xy);
+    Lterm* substituted = lam_subst_dup(&ly_x, X, &xy);
 
     Lterm xResVarName = LAPP(LVAR(X),LVAR(Y));
     Lterm ly_xResVarName = LABS(RES_CHAR1, xResVarName);
