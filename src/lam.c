@@ -340,11 +340,11 @@ int lam_rename_var_in_place(Lterm t[static 1], Lstr varname, Lstr newname) {
                     return -1;
                 }
             }
-            return lam_rename_var(t->abs.body, varname, newname);
+            return lam_rename_var_in_place(t->abs.body, varname, newname);
         }
         case Lapptag: {
-            return lam_rename_var(t->app.fun, varname, newname) 
-                 | lam_rename_var(t->app.param, varname, newname);
+            return lam_rename_var_in_place(t->app.fun, varname, newname) 
+                 | lam_rename_var_in_place(t->app.param, varname, newname);
        }
        default: LOG_INVALID_LTERM_AND_EXIT ;
     }

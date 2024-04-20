@@ -34,6 +34,7 @@ Lterm* lam_subst_inplace(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
                         lam_free((void*)fresh_name.s);
                         return 0x0;
                     };
+                    lam_free((void*)body->abs.vname.s); 
 					body->abs.vname = fresh_name;
                 }
 
