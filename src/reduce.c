@@ -67,6 +67,7 @@ Lterm* lam_subst_inplace(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
             Lterm* pred = lam_subst_inplace(body->app.param, x, s);
             if (lam_invalid_term(pred)) {
                 lam_free((void*)x.s);
+                //TODO: free term?
                 lam_free_term(body);
                 return pred;
             }
@@ -81,78 +82,6 @@ Lterm* lam_subst_inplace(Lterm body[static 1], Lstr x, Lterm s[static 1]) {
         };
     }
 }
-/*
- * This function "consumes its parameters: their heap memory is freed after this fn returns.
- */
-Lterm* lam_red_subst(Lterm t[static 1], const Lstr x, Lterm s[static 1]) {
-    switch(t->tag) {
-        case Lvartag: {
-            if (lam_str_eq(t->var.name, x)) { 
-                lam_free((void*)x.s);
-                lam_free(t);
-                return s;
-            }
-            else {
-                lam_free((void*)x.s);
-                lam_free(s);
-                return t;
-            }
-        }
-        case Labstag: {
-            if (lam_is_var_free_in(t,x)) {
-                if (lam_is_var_free_in(s, t->abs.vname)) {
-                    //TODO: review this
-                    puts("rename var! (TODO: remove me)====="); exit(1);
-                    Lstr fresh_name = lam_get_fresh_var_name(t);
-                    if (lam_str_null(fresh_name)) { return 0x0; }
-                    lam_rename_var(t->abs.body, t->abs.vname, fresh_name);
-					t->abs.vname = fresh_name;
-                }
-
-                Lterm* b = lam_red_subst(t->abs.body, lam_lstr_dup(x), s);
-                if (lam_invalid_term(b)) {
-                    puts("DEBUG: invalid term"); 
-                    lam_free_term(t);
-                    lam_free((void*)x.s);
-                    return b;
-                }
-                lam_free((void*)x.s);
-                return b;
-            } else { //x is captured by \x
-                lam_free((void*)x.s);
-                return t;
-            }
-        }
-        case Lapptag: {
-            Lterm* fred = lam_red_subst(t->app.fun, lam_lstr_dup(x), s);
-            if (lam_invalid_term(fred)) {
-                lam_free((void*)x.s);
-                lam_free_term(t);
-                return fred;
-            }
-            t->app.fun = fred;
-            Lterm* s_clone = lam_clone(s);
-            if (lam_invalid_term(s)) {
-                lam_free((void*)x.s);
-                lam_free_term(t);
-                return 0x0;
-            }
-            Lterm* pred = lam_red_subst(t->app.param, x, s_clone);
-            if (lam_invalid_term(pred)) {
-                lam_free((void*)x.s);
-                lam_free_term(t);
-                return pred;
-            }
-            t->app.param = pred;
-            lam_free((void*)x.s);
-            return t;
-        }
-        default: {
-            lam_free_term(t);
-             return lam_internal_error();
-        };
-    }
-}
 
 
 /*
@@ -162,7 +91,10 @@ Lterm* lam_red_subst(Lterm t[static 1], const Lstr x, Lterm s[static 1]) {
  *
  */
 Lterm* lam_reduce_step(Lterm* t) {
-    if (!t) { return lam_internal_error(); }
+    if (!t) {
+        lam_free_term(t);
+        return lam_internal_error();
+    }
     switch (t->tag) {
         case Lvartag: return t;
         case Labstag: {
