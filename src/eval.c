@@ -6,7 +6,7 @@ Lterm* lam_eval_app(const Lapp app[static 1]) {
     Lterm* body = app->fun->abs.body;
     Lterm* s = app->param;
 
-    Lterm* r = lam_substitute(body, x, s);
+    Lterm* r = lam_subst_dup(body, x, s);
     return r;
 }
 
@@ -102,7 +102,7 @@ void eval_to_list(Lterm* t[static 1], void* acum) {
     if (acum) {
 
         LtermList* node = lam_malloc(sizeof(LtermList));
-        if (!node) { puts("lam malloc error"); exit(EXIT_FAILURE); }
+        if (!node) { puts("lam_malloc error"); exit(EXIT_FAILURE); }
         *node = (LtermList){ .next=NULL,.t=v };
 
         ToListCallbackAcum* a = acum; 

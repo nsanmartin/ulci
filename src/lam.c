@@ -183,12 +183,13 @@ Lterm* lam_new_abs(Lstr vn, const Lterm body[static 1]) {
 
 Lterm* lam_abs(Lstr vn, Lterm body[static 1]) {
     if (lam_str_null(vn)) {
-        lam_free_term((void*)body);
+        lam_free_term(body);
         return 0x0;
     } 
     Lterm* rv = lam_malloc(sizeof (*rv));
     if (!rv) {
-        lam_free_term((void*)body);
+        lam_free_term(body);
+        lam_free((void*)vn.s);
         return 0x0;
     }
     *rv = (Lterm) { .tag = Labstag, .abs= (Labs) {.vname=vn, .body=body}};
@@ -367,7 +368,7 @@ Lterm* lam_clone(const Lterm t[static 1]) {
 
 
 Lterm*
-lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
+lam_subst_dup(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
     switch(t->tag) {
         case Lvartag: {
             if (lam_str_eq(t->var.name, x)) {
@@ -389,7 +390,7 @@ lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
 					u->abs.vname = fresh_name;
                 }
 
-                Lterm* subst = lam_substitute(u->abs.body, x, s);
+                Lterm* subst = lam_subst_dup(u->abs.body, x, s);
                 if (!subst) { return 0x0; }
                 Lstr vn = u->abs.vname;
                 if (lam_str_null(vn)) { return 0x0; }
@@ -405,9 +406,9 @@ lam_substitute(const Lterm t[static 1], Lstr x, const Lterm s[static 1]) {
             }
         }
         case Lapptag: {
-            Lterm* f_ = lam_substitute(t->app.fun, x, s);
+            Lterm* f_ = lam_subst_dup(t->app.fun, x, s);
             if (!f_) { return 0x0; }
-            Lterm* p_ = lam_substitute(t->app.param, x, s);
+            Lterm* p_ = lam_subst_dup(t->app.param, x, s);
             if (!p_) {  return 0x0; }
             Lterm* rv = lam_malloc(sizeof(*rv));
             if (!rv) {  return 0x0; }
@@ -505,14 +506,14 @@ Lstr lam_term_to_str_more_paren(const Lterm t[static 1]) {
         case Labstag: {
             Lstr bstr = lam_term_to_str_more_paren(t->abs.body);
             if (!bstr.s) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
             size_t len = lam_strlen(bstr);
             size_t lenrv = 1 + len + 4 + lam_strlen(t->abs.vname);
             char* buf = lam_malloc(sizeof(char) * lenrv);;
             if (!buf) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
             size_t n = snprintf(buf, lenrv, "(\\%s.%s)", t->abs.vname.s, bstr.s);
@@ -525,12 +526,12 @@ Lstr lam_term_to_str_more_paren(const Lterm t[static 1]) {
         case Lapptag: {
             Lstr fstr = lam_term_to_str_more_paren(t->app.fun);
             if (!fstr.s) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
             Lstr pstr = lam_term_to_str_more_paren(t->app.param);
             if (!pstr.s) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
 
@@ -556,14 +557,14 @@ Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
         case Labstag: {
             Lstr bstr = lam_term_to_str_less_paren(t->abs.body);
             if (!bstr.s) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
             size_t len = lam_strlen(bstr);
             size_t lenrv = 1 + len + 2 + lam_strlen(t->abs.vname);
             char* buf = lam_malloc(sizeof(char) * lenrv);;
             if (!buf) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
             size_t n = snprintf(buf, lenrv, "\\%s.%s", t->abs.vname.s, bstr.s);
@@ -576,12 +577,12 @@ Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
         case Lapptag: {
             Lstr fstr = lam_term_to_str_less_paren(t->app.fun);
             if (!fstr.s) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
             Lstr pstr = lam_term_to_str_less_paren(t->app.param);
             if (!pstr.s) {
-                perror("malloc returned null.");
+                perror("lam_malloc returned null.");
                 return LEMPTY_STR();
             }
 
@@ -631,7 +632,7 @@ bool lam_normal_form(const Lterm t[static 1]) {
  */
 
 // Callbacks
-// pcb (Parse CalBacks)
+// pcb (Parse CallBacks)
 
 void lam_pcb_id(Lterm* tptr[static 1], /*(Lterm**)*/void* rvp) { *(Lterm**)rvp = *tptr; }
 
@@ -659,14 +660,29 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
     Lterm* t = lam_reduce(*tptr);
     *tptr = t;
 
-    if (!t || t->tag == Lerrtag) {
-        if (t && t->err.tag == LNotReducingTag) {
-            printf("eval error: term is not reducing\n");
-        } else if (t && t->err.tag == LTooManyReductionsTag) {
-            puts("eval error: too many reductions");
-        }
-        else {//(!t || t->err.tag == LamInternalError) {
-            puts("Lam internal error");
+    if (!t) { puts("Lam internal error: unexpected NULL term, aborting."); exit(EXIT_FAILURE); }
+    if (t->tag == Lerrtag) {
+        switch (t->err.tag) {
+            case LInternalErrorTag: {
+                printf("Lam internal error");
+                break;
+            }
+            case LNotParseTag: {
+                printf("Lam internal error: unexpected not parse");
+                break;
+            }
+            case LSyntaxErrorTag: {
+                printf("Syntax error");
+                break;
+            }
+            case LNotReducingTag: {
+                printf("eval error: term is not reducing");
+                break;
+            }
+            case LTooManyReductionsTag: {
+                printf("eval error: too many reductions");
+                break;
+            }
         }
     } else {
         on_parse(t);

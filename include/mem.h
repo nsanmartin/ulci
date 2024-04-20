@@ -5,17 +5,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <str.h>
+//#define MEM_TEST
 
-void* lam_malloc(size_t size) ;
-void* lam_calloc(size_t nmemb, size_t size);
-void lam_free_mem(void);
-char* lam_strndup(const char* s, size_t n);
-//char* lam_strdup(const char* s) ;
+#ifdef MEM_TEST
+#define lam_malloc(S) _lam_malloc(S, __func__)
+#define lam_calloc(NM, S) _lam_calloc(NM, S, __func__)
+#define lam_strdup(STR) _lam_strdup(STR, __func__)
+#define lam_strndup(STR ,SZ) _lam_strndup(STR, SZ, __func__)
+#else
+#define lam_malloc(S) _lam_malloc(S, "")
+#define lam_calloc(NM, S) _lam_calloc(NM, S, "")
+#define lam_strdup(STR) _lam_strdup(STR, "")
+#define lam_strndup(STR ,SZ) _lam_strndup(STR, SZ, "")
+#endif
+
+void* _lam_malloc(size_t size, const char* caller) ;
+void* _lam_calloc(size_t nmemb, size_t size, const char* caller);
+char* _lam_strdup(const char* s, const char* caller);
+char* _lam_strndup(const char* s, size_t n, const char* caller) ;
 
 void lam_free(void* ptr);
-//static inline char* lam_strdup(const char* s) { return strdup(s); }
-char* lam_strdup(const char* s);
+void lam_free_mem(void);
 
 void print_mem_summary(void) ;
 #endif

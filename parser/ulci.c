@@ -23,7 +23,7 @@ int interactive_interpreter(StmtReadCallback* callback) {
             lam_parse_stmts(callback);
             add_history(line);
         }
-        free(line);
+        lam_free(line);
     }
     return 0;
 }
@@ -50,6 +50,6 @@ int main (int argc, char* argv[]) {
         }
     }
     free_symbol_table();
-    //print_mem_summary();
+    print_mem_summary();
     return 0;
 }
