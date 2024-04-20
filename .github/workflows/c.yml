@@ -23,6 +23,10 @@ jobs:
       run: make build/filter_ok
     - name: make ulci
       run: make build/ulci
+    - name: make utests
+      run: make build/utests
+    - name: make itests
+      run: make build/itests
     - name: utests
       run: ./build/utests
     - name: itests
