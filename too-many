@@ -1,6 +1,0 @@
-\s.\s.\v.\s.\z.x
-\s.\s.\v.\x.x
-\s.\s.x
-\s.\s.\x.\v.x (\t.x) (x (\x.x x x))
-eval error: term is not reducing
-term: 'DEBUG: freeing invalid term :/

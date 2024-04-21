@@ -3,7 +3,7 @@
 # CC=zig cc 
 # CC=clang
 
-CFLAGS:=-g  -Wall -Wextra -pedantic -Iinclude -Ibdwgc/include
+CFLAGS:=-g  -Wall -Wextra -pedantic -Iinclude # -fsplit-stack
 STRICT_CFLAGS:= -Werror
 
 BUILD=./build
