@@ -21,10 +21,10 @@ size_t last_dealloc = 0;
 
 void push_allocd(uintptr_t p, const char* c, size_t i) {
     //printf("caller: %s, ptr: %lx\n", c, p);
-    allocated[i] = (PtrCaller){.p=p, c=c}; 
+    allocated[i] = (PtrCaller){.p=p, .c=c}; 
 }
 
-void check_all_freed() {
+void check_all_freed(void) {
     for (size_t i = 0; i < last_alloc; ++i) {
         PtrCaller allocd = allocated[i];
 
@@ -43,7 +43,7 @@ void check_all_freed() {
     }
 }
 
-void clear_allocated() {
+void clear_allocated(void) {
     for (size_t i = 0; i < last_alloc; ++i) { allocated[i].p = 0; }
     for (size_t i = 0; i < last_dealloc; ++i) { deallocated[i].p = 0; }
 }
