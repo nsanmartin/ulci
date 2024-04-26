@@ -60,7 +60,6 @@ nico@host:~$ ./build/ulci
 ```
 > set apply = (\x.\y. x y)
 \x.\y.x y
-\x.x x
 > set dup = (\x.x x)
 \x.x x
 > apply dup A
