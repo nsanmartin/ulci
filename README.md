@@ -54,7 +54,7 @@ make build/ulci
 ## Run
 
 You either pass expressions from `stdin` and use it interactively like:
-nico@host:~$ ./build/ulci
+$ ./build/ulci
 
 
 ```
@@ -71,7 +71,7 @@ and
 
 
 ```
-nico@host:~$ echo "(\x.A) B" | ./build/ulci
+$ echo "(\x.A) B" | ./build/ulci
 > (\x.A) B
 A
 ```
@@ -81,7 +81,7 @@ Or you can pass the paths of files containing valid ulc expressions
 
 ```
 ./ulci foo.ulc
-nico@host:~$ ./build/ulci samples/0.ulc samples/1.ulc
+$ ./build/ulci samples/0.ulc samples/1.ulc
 \x.x
 A
 \t.y
