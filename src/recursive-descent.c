@@ -52,7 +52,6 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
     if (lam_parse_tk_next_match_or_unget(ctx, LLparen)) {
         Lterm* expr = lam_parse_expression(ctx);
         if (lam_parse_term_failed(expr)) {
-            lam_free_term(expr);
             return expr; 
         }
         if (lam_parse_tk_next_match_or_unget(ctx, LRparen)) {

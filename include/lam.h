@@ -26,7 +26,7 @@
 #define LOG_INVALID_LTERM_AND_EXIT                                     \
     LOG_INVALID_LTERM; exit(EXIT_FAILURE)
 
-typedef enum { Lvartag, Labstag, Lapptag, Lerrtag } Lamtag;
+typedef enum { Lvartag, Labstag, Lapptag, Lerrtag, LamtagCount } Lamtag;
 typedef enum { LInternalErrorTag, LNotParseTag, LSyntaxErrorTag, LNotReducingTag, LTooManyReductionsTag } LerrorTag;
 
 typedef struct Lterm Lterm;
