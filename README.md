@@ -27,7 +27,7 @@ interpreter can be built `#define`ing `NO_READLINE` or simply building
 make build/ulci-no-readline
 ```
 
-which will have the same behaviour when passing a file and obviously a diferent repl.
+which will have the same behaviour when passing a file and obviously a different repl.
 
 
 For (the ridiculously few) unit tests, it uses the following submodule:
