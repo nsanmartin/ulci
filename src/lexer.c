@@ -31,11 +31,14 @@ typedef struct {
     size_t len;
 } StrIter;
 
+size_t __ncol = 0;
+
 // Scan from string:
 StrIter _lam_scan_str_iter = { .buf=0x0, .ix=0, .len=0 };
 
 char lam_getc_str(void) {
     if (_lam_scan_str_iter.ix <  _lam_scan_str_iter.len) {
+        ++__ncol;
         return _lam_scan_str_iter.buf[_lam_scan_str_iter.ix++];
     }
     return '\0';
@@ -48,6 +51,7 @@ int lam_ungetc_str(char c) {
             puts("Unget error, must match (TODO change this?)");
             exit(1);
         }
+        --__ncol;
     }
     return c;
 }
@@ -55,8 +59,10 @@ int lam_ungetc_str(char c) {
 
 // Scan from file:
 FILE* _lam_scan_file = 0x0;
-char lam_getc_file(void) { return fgetc(_lam_scan_file); }
-int lam_ungetc_file(char c) { return ungetc(c, _lam_scan_file); }
+char lam_getc_file(void) { ++__ncol; return fgetc(_lam_scan_file); }
+int lam_ungetc_file(char c) { --__ncol; return ungetc(c, _lam_scan_file); }
+//TODO: avoid using global state and use thelexer context instead
+size_t lam_get_ncol(void) { return __ncol; }
 
 
 ///
@@ -65,12 +71,14 @@ char (*_lam_getc)(void) = lam_getc_str;
 int (*_lam_ungetc)(char c) = lam_ungetc_str;
 
 void lam_scan_set_file_input(FILE* fp) {
+    __ncol = 0;
     _lam_scan_file = fp;
     _lam_getc = lam_getc_file;
     _lam_ungetc = lam_ungetc_file;
 }
 
 void lam_scan_set_str_input(const char* buf) {
+    __ncol = 0;
     _lam_scan_str_iter.buf = buf;
     _lam_scan_str_iter.ix = 0;
     _lam_scan_str_iter.len = strlen(buf); 

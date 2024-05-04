@@ -33,9 +33,10 @@ void lam_free_term(Lterm* t) {
             return;
         }
         case Lerrtag: {
-            if (t->err.t) {
-                lam_free_term(t->err.t);
-            }
+            // not needed since we are using literal strings
+            //if (t->err.msg) {
+            //    lam_free((char*)t->err.msg);
+            //}
             lam_free(t);
             return;
         }
@@ -101,36 +102,36 @@ unsigned lam_term_height(const Lterm* t) {
 Lterm* lam_not_parse(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
-    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotParseTag, .t=0x0 }};
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotParseTag, .msg=0x0 }};
     return rv;
 }
 
 //TODO: store info?
-Lterm* lam_syntax_error(void) {
+Lterm* lam_syntax_error(const char* msg) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
-    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LSyntaxErrorTag, .t=0x0 }};
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LSyntaxErrorTag, .msg=msg }};
     return rv;
 }
 
 Lterm* lam_internal_error(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
-    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LInternalErrorTag, .t=0x0 }};
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LInternalErrorTag, .msg=0x0 }};
     return rv;
 }
 
 Lterm* lam_not_reducing(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
-    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotReducingTag, .t=0x0 }};
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotReducingTag, .msg=0x0 }};
     return rv;
 }
 
 Lterm* lam_too_many_reductions(void) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
-    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LTooManyReductionsTag, .t=0x0 }};
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LTooManyReductionsTag, .msg=0x0 }};
     return rv;
 }
 
@@ -672,7 +673,7 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
                 break;
             }
             case LSyntaxErrorTag: {
-                printf("Syntax error");
+                printf("Syntax error at col %ld: %s", lam_get_ncol(), t->err.msg);
                 break;
             }
             case LNotReducingTag: {
