@@ -1,5 +1,8 @@
+CFLAGS:=-g  -Wall -Wextra -pedantic -Iinclude
+STRICT_CFLAGS:= -Werror
+
 main:
-	gcc -I../include -o build/$@ $@.c
+	$(CC) $(STRICT_CFLAGS) $(CFLAGS) -I../include -o build/$@ $@.c
 
 
 clean:

@@ -3,7 +3,7 @@
 # CC=zig cc 
 # CC=clang
 
-CFLAGS:=-g  -Wall -Wextra -pedantic -Iinclude # -fsplit-stack
+CFLAGS:=-g  -Wall -Wextra -pedantic -Iinclude  #-fsplit-stack
 STRICT_CFLAGS:= -Werror
 
 BUILD=./build
@@ -98,20 +98,27 @@ bison-no-warnings:
 ####
 ## Valgrind
 
+SHELL :=  bash
+
+genexpr/build/main:
+	make -C genexpr
+
+valgrind-parsed-ok: genexpr/build/main build/ulci
+	source ./bash/valgrind-parsed-ok.sh
+
+valgrind-too-many-reductions: genexpr/build/main build/ulci
+	source ./bash/valgrind-too-many-reductions.sh
+
+valgrind-too-many-reductions-large: genexpr/build/main build/ulci
+	source ./bash/valgrind-too-many-reductions-large.sh
+
+valgrind-not-reducing: genexpr/build/main build/ulci
+	source ./bash/valgrind-not-reducing.sh
+
+valgrind-sample: valgrind-parsed-ok valgrind-too-many-reductions
+
+valgrind-large-sample: valgrind-sample valgrind-too-many-reductions-large
+
 valgrind-t:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci $T
 
-valgrind-var:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci samples/var
-
-valgrind-app:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci samples/app
-
-valgrind-abs:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci samples/abs
-
-valgrind-foo:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci ~/ulci/foo
-
-valgrind-samples:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out ./build/ulci ~/ulci/samples
