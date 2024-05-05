@@ -29,8 +29,8 @@ PARSER_SRCS=$(wildcard $(PARSER_DIR)/*.c)
 all: build/filter_ok build/ulci build/lexer build/bison-generated run-tests
 
 run-tests: $(BUILD)/utests $(BUILD)/itests
-	$(BUILD)/utests
-	$(BUILD)/itests
+	$(BUILD)/utests \
+		&& $(BUILD)/itests
 
 
 $(BUILD)/filter_ok: $(LAM_OBJ)

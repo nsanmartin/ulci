@@ -35,7 +35,7 @@ typedef struct Lterm Lterm;
 typedef struct { Lstr name; } Lvar;
 typedef struct { Lstr vname; Lterm* body; } Labs;
 typedef struct { Lterm* fun; Lterm* param; } Lapp;
-typedef struct { LerrorTag tag; const char* msg; } Lerr;
+typedef struct { LerrorTag tag; const char* msg; LamTokenTag tk; size_t col; } Lerr;
 
 typedef struct Lterm {
     Lamtag tag;
@@ -77,7 +77,6 @@ Lterm* lam_var(Lstr n);
 Lterm* lam_abs(Lstr vn, Lterm body[static 1]);
 Lterm* lam_app(Lterm fun[static 1], Lterm param[static 1]);
 Lterm* lam_not_parse(void);
-Lterm* lam_syntax_error(const char*);
 Lterm* lam_internal_error(void);
 Lterm* lam_not_reducing(void);
 Lterm* lam_too_many_reductions(void);

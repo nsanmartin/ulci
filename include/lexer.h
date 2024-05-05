@@ -9,6 +9,7 @@ typedef struct {
     char s[LamMaxKeywordLen];
     size_t len;
     size_t col;
+    // rename to LamLexerCtx
 } LamKeywordBuf;
 
 typedef enum {
@@ -35,5 +36,5 @@ void lam_scan_set_str_input(const char* buf);
 static inline void assert_keyword_len_is_valid(size_t l) { 
     if(l >= LamMaxKeywordLen) { puts("Lam: keyword too large, aborting."); exit(EXIT_FAILURE); }
 }
-size_t lam_get_ncol(void);
+static inline size_t lam_get_ncol(LamKeywordBuf buf[static 1]) { return buf->col; }
 #endif

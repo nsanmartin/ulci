@@ -13,6 +13,8 @@ typedef struct {
     bool unget;
 } RecDescCtx;
 
+Lterm* lam_syntax_error(const char* msg, RecDescCtx* ctx);
+
 typedef struct {
     void (*callback)(Lterm*t[static 1], void*);
     void* acum;

@@ -58,7 +58,7 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
             return expr; 
         }
         lam_free_term(expr);
-        return lam_syntax_error("Expecting LRparen");
+        return lam_syntax_error("Expecting LRparen", ctx);
     } else if (lam_parse_tk_next_match_or_unget(ctx, LVar)) {
         return lam_var(lam_parse_tk_dup_kw(ctx));
     } else if (lam_parse_tk_next_match_or_unget(ctx, LName)) {
@@ -90,11 +90,11 @@ Lterm* lam_parse_lambda(RecDescCtx* ctx) {
     if (!lam_parse_tk_next_match_or_unget(ctx, LLambda)) {
         return lam_not_parse();
     }
-    if (!lam_parse_tk_next_match(ctx, LVar)) { return lam_syntax_error("Expecting Var"); }
+    if (!lam_parse_tk_next_match(ctx, LVar)) { return lam_syntax_error("Expecting Var", ctx); }
     Lstr v = lam_parse_tk_dup_kw(ctx);
     if (!lam_parse_tk_next_match(ctx, LDot)) {
         lam_free((void*)v.s);
-        return lam_syntax_error("Expecting a Dot");
+        return lam_syntax_error("Expecting a Dot", ctx);
     }
     Lterm* expr = lam_parse_expression(ctx);
     if (lam_parse_term_failed(expr)) {
@@ -118,13 +118,13 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     if (!ctx) return lam_internal_error();
     if (!lam_parse_tk_next_match_or_unget(ctx, LSet)) { return lam_not_parse(); }
     if (!lam_parse_tk_next_match_or_unget(ctx, LVar)) {
-        return lam_syntax_error("Expecting a Var");
+        return lam_syntax_error("Expecting a Var", ctx);
     }
     Lstr v = lam_parse_tk_dup_kw(ctx);
     if (lam_str_null(v)) { return 0x0; }
     if (!lam_parse_tk_next_match_or_unget(ctx, LEquals)) {
         lam_free((void*)v.s);
-        return lam_syntax_error("Expecting Equals");
+        return lam_syntax_error("Expecting Equals", ctx);
     }
     Lterm* expr = lam_parse_expression(ctx);
     if (lam_parse_term_failed(expr)) {
@@ -135,7 +135,7 @@ Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
         lam_free((void*)v.s);
         lam_free_term(expr);
         lam_parse_tk_unget(ctx);
-        return lam_syntax_error("Expecting End of stmt");
+        return lam_syntax_error("Expecting End of stmt", ctx);
     }
 
     int err = lam_str_name_insert(v, (Lterm*)expr);
