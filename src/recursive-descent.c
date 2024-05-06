@@ -64,7 +64,7 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
     } else if (lam_parse_tk_next_match_or_unget(ctx, LName)) {
         return lam_symbols_search_clone(lam_parse_tk_kw_view(ctx));
     }
-    return lam_not_parse();
+    return lam_not_parse("expecting a Var or a Name", ctx);
 }
 
 Lterm* lam_parse_not_lambda(RecDescCtx* ctx) {
@@ -88,7 +88,7 @@ Lterm* lam_parse_not_lambda(RecDescCtx* ctx) {
 Lterm* lam_parse_lambda(RecDescCtx* ctx) {
     if (!ctx) return lam_internal_error();
     if (!lam_parse_tk_next_match_or_unget(ctx, LLambda)) {
-        return lam_not_parse();
+        return lam_not_parse("Expecting Lambda", ctx);
     }
     if (!lam_parse_tk_next_match(ctx, LVar)) { return lam_syntax_error("Expecting Var", ctx); }
     Lstr v = lam_parse_tk_dup_kw(ctx);
@@ -116,7 +116,7 @@ Lterm* lam_parse_expression(RecDescCtx* ctx) {
 
 Lterm* lam_parse_stmt_set(RecDescCtx* ctx) {
     if (!ctx) return lam_internal_error();
-    if (!lam_parse_tk_next_match_or_unget(ctx, LSet)) { return lam_not_parse(); }
+    if (!lam_parse_tk_next_match_or_unget(ctx, LSet)) { return lam_not_parse("expecting Set", ctx); }
     if (!lam_parse_tk_next_match_or_unget(ctx, LVar)) {
         return lam_syntax_error("Expecting a Var", ctx);
     }

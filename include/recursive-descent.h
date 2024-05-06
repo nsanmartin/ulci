@@ -14,6 +14,7 @@ typedef struct {
 } RecDescCtx;
 
 Lterm* lam_syntax_error(const char* msg, RecDescCtx* ctx);
+Lterm* lam_not_parse(const char* msg, RecDescCtx* ctx);
 
 typedef struct {
     void (*callback)(Lterm*t[static 1], void*);

@@ -99,14 +99,21 @@ unsigned lam_term_height(const Lterm* t) {
  * Factory methods
  **/
 
-Lterm* lam_not_parse(void) {
+Lterm* lam_not_parse(const char* msg, RecDescCtx* ctx) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
-    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LNotParseTag, .msg=0x0 }};
+    *rv = (Lterm) {
+        .tag=Lerrtag,
+        .err = (Lerr) {
+            .tag=LNotParseTag,
+            .msg=msg,
+            .tk=ctx->last,
+            .col=ctx->buf.col
+        }
+    };
     return rv;
 }
 
-//TODO: store info?
 Lterm* lam_syntax_error(const char* msg, RecDescCtx* ctx) { //LamTokenTag tk, size_t col) {
     Lterm* rv = lam_malloc(sizeof (Lterm));
     if (!rv) { return 0x0; }
@@ -677,7 +684,8 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
                 break;
             }
             case LNotParseTag: {
-                printf("Lam internal error: unexpected not parse");
+                const char* tk = lam_token_to_str(t->err.tk);
+                printf("Parse failed at col %ld (tk: %s): %s", t->err.col, tk, t->err.msg);
                 break;
             }
             case LSyntaxErrorTag: {
