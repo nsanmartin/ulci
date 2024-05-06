@@ -19,6 +19,7 @@ bool lam_parse_tk_next_is_end(RecDescCtx* ctx) {
     return lam_stmt_is_end(ctx->last);
 }
 
+
 int lam_parse_tk_unget(RecDescCtx* ctx) {
     if (ctx->unget) {
         puts("Lam internal error: should not unget twice, aborting");
@@ -26,6 +27,14 @@ int lam_parse_tk_unget(RecDescCtx* ctx) {
     }
     ctx->unget = true;
     return 0;
+}
+
+bool lam_parse_tk_next_is_end_or_unget(RecDescCtx* ctx) {
+    if (lam_parse_tk_next_is_end(ctx)) {
+        return true;
+    }
+    lam_parse_tk_unget(ctx);
+    return false;
 }
 
 bool lam_parse_tk_next_match(RecDescCtx* ctx, LamTokenTag t) {
@@ -158,15 +167,20 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
     for (;;) {
         RecDescCtx ctx = {0};
         if (lam_parse_tk_next_match_or_unget(&ctx, LEof)) { return; }
-        if (lam_parse_tk_next_is_end(&ctx)) { continue; }
-        lam_parse_tk_unget(&ctx);
+        if (lam_parse_tk_next_is_end_or_unget(&ctx)) { continue; }
 
         Lterm* t = lam_parse_stmt_set(&ctx);
 
         if (lam_is_not_parse(t)) {
             lam_free_term(t);
             t = lam_parse_expression(&ctx);
+
+            if (!(lam_parse_tk_next_is_end_or_unget(&ctx) || lam_parse_tk_next_match_or_unget(&ctx, LEof))) {
+                lam_free_term(t);
+                t = lam_syntax_error("expecting End", &ctx);
+            }
         } 
+
 
         lam_parse_apply_callbacks(on_stmt_read, &t);
     }
