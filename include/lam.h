@@ -132,5 +132,4 @@ void reduce_print_free_callback(Lterm* t[static 1], void* ignore);
 Lstr parse_string_rec_desc_to_str(const char* in, Lstr (*to_str)(const Lterm[static 1]));
 void free_term_callback(Lterm* tptr[static 1], void* ignore);
 Lstr parse_string_rec_desc_reduce_to_str(const char* in, Lstr (*to_str)(const Lterm[static 1]));
-const char* lam_error_to_str(LerrorTag error);
 #endif // __LAM_H_

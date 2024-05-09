@@ -40,8 +40,7 @@ static inline bool lam_parse_term_failed(const Lterm* t) {
  */
 static inline bool lam_parse_term_exception(const Lterm* t) {
     return !t || t->tag >= LamtagCount || (
-        t->tag == Lerrtag && ( t->err.tag == LSyntaxErrorTag || t->err.tag == LInternalErrorTag)
-        //t->tag == Lerrtag && (t->err.tag == LLexicalError || t->err.tag == LSyntaxErrorTag || t->err.tag == LInternalErrorTag)
+        t->tag == Lerrtag && (t->err.tag == LLexicalError || t->err.tag == LSyntaxErrorTag || t->err.tag == LInternalErrorTag)
     );
 }
 
