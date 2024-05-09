@@ -28,26 +28,29 @@ static inline bool lam_parse_term_failed(const Lterm* t) {
         && (
             t->err.tag == LNotParseTag
             || t->err.tag == LSyntaxErrorTag
+            || t->err.tag == LLexicalError
             || t->err.tag == LInternalErrorTag
         )
     );
 }
 
 /*
- * An "exception" during parsing includes s syntax error (the user proviedd an invalid input)
+ * An "exception" during parsing includes a lexical or syntax error (the user proviedd an invalid input)
  * or an internal lam error (NULL ptr or LInternalError).
  */
 static inline bool lam_parse_term_exception(const Lterm* t) {
-    return !t || t->tag >= LamtagCount || (t->tag == Lerrtag && (t->err.tag == LSyntaxErrorTag || t->err.tag == LInternalErrorTag));
+    return !t || t->tag >= LamtagCount || (
+        t->tag == Lerrtag && (t->err.tag == LLexicalError || t->err.tag == LSyntaxErrorTag || t->err.tag == LInternalErrorTag)
+    );
 }
 
 static inline bool lam_is_not_parse(const Lterm* t) {
     return t && t->tag == Lerrtag && t->err.tag == LNotParseTag;
 }
 
-static inline bool lam_is_syntax_error(const Lterm* t) {
-    return t && t->tag == Lerrtag && t->err.tag == LSyntaxErrorTag;
-}
+static inline bool lam_is_syntax_error(const Lterm* t) { return t && t->tag == Lerrtag && t->err.tag == LSyntaxErrorTag; }
+
+static inline bool lam_is_lexical_error(const Lterm* t) { return t && t->tag == Lerrtag && t->err.tag == LLexicalError; }
 
 static inline bool lam_is_internal_error(const Lterm* t) {
     return !t || t->tag >= LamtagCount || (t->tag == Lerrtag && t->err.tag == LInternalErrorTag);

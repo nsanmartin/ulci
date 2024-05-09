@@ -73,6 +73,7 @@ Lterm* lam_parse_neither_lnorapp(RecDescCtx* ctx) {
     } else if (lam_parse_tk_next_match_or_unget(ctx, LName)) {
         return lam_symbols_search_clone(lam_parse_tk_kw_view(ctx));
     }
+
     return lam_not_parse("expecting a Var or a Name", ctx);
 }
 
@@ -175,13 +176,17 @@ void lam_parse_stmts(StmtReadCallback* on_stmt_read) {
             lam_free_term(t);
             t = lam_parse_expression(&ctx);
 
-            if (!(lam_parse_tk_next_is_end_or_unget(&ctx) || lam_parse_tk_next_match_or_unget(&ctx, LEof))) {
+            if (ctx.last !=  LErrorInputTooLarge 
+                && !(lam_parse_tk_next_is_end_or_unget(&ctx) || lam_parse_tk_next_match_or_unget(&ctx, LEof))) {
                 lam_free_term(t);
                 t = lam_syntax_error("expecting End", &ctx);
             }
         } 
 
-
+        if (ctx.last ==  LErrorInputTooLarge) {
+            lam_free_term(t);
+            t = lam_lexical_error("expression too large");
+        }
         lam_parse_apply_callbacks(on_stmt_read, &t);
     }
 }

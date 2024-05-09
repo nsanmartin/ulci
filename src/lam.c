@@ -8,9 +8,6 @@
 #include <recursive-descent.h>
 
 
-long used_fresh_vars = 0;
-
-unsigned nfred = 0;
 void lam_free_term(Lterm* t) {
     if (!t) { puts("DEBUG: freeing NULL term :/"); LOG_INVALID_LTERM_AND_EXIT; }
 
@@ -149,6 +146,14 @@ Lterm* lam_too_many_reductions(void) {
     *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LTooManyReductionsTag, .msg=0x0 }};
     return rv;
 }
+
+Lterm* lam_lexical_error(const char* msg) {
+    Lterm* rv = lam_malloc(sizeof (Lterm));
+    if (!rv) { return 0x0; }
+    *rv = (Lterm) { .tag=Lerrtag, .err = (Lerr) { .tag=LLexicalError, .msg=msg }};
+    return rv;
+}
+
 
 Lterm* lam_new_var(Lstr n) {
     if (lam_str_null(n)) { return 0x0; } 
@@ -561,6 +566,11 @@ Lstr lam_term_to_str_more_paren(const Lterm t[static 1]) {
             }
             return lam_str(buf);
         }
+        case Lerrtag: {
+            perror("parse failed");
+            return LEMPTY_STR();
+        }
+
         default: LOG_INVALID_LTERM_AND_EXIT ;
     }
 }
@@ -629,6 +639,10 @@ Lstr lam_term_to_str_less_paren(const Lterm t[static 1]) {
             return lam_str(buf);
             
         }
+        case Lerrtag: {
+            perror("parse failed");
+            return LEMPTY_STR();
+        }
         default: LOG_INVALID_LTERM_AND_EXIT ;
     }
 }
@@ -679,13 +693,13 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
     if (!t) { puts("Lam internal error: unexpected NULL term, aborting."); exit(EXIT_FAILURE); }
     if (t->tag == Lerrtag) {
         switch (t->err.tag) {
-            case LInternalErrorTag: {
-                printf("Lam internal error");
-                break;
-            }
             case LNotParseTag: {
                 const char* tk = lam_token_to_str(t->err.tk);
                 printf("Parse failed at col %ld (tk: %s): %s", t->err.col, tk, t->err.msg);
+                break;
+            }
+            case LLexicalError: {
+                printf("Lexical error: %s",  t->err.msg);
                 break;
             }
             case LSyntaxErrorTag: {
@@ -699,6 +713,11 @@ void reduce_print_free_callback(Lterm* tptr[static 1], void* ignore) {
             }
             case LTooManyReductionsTag: {
                 printf("eval error: too many reductions");
+                break;
+            }
+            case LInternalErrorTag:
+            case LerrorTagCount: {
+                printf("Lam internal error");
                 break;
             }
         }
