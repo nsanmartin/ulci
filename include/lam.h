@@ -28,7 +28,15 @@
     LOG_INVALID_LTERM; exit(EXIT_FAILURE)
 
 typedef enum { Lvartag, Labstag, Lapptag, Lerrtag, LamtagCount } Lamtag;
-typedef enum { LInternalErrorTag, LNotParseTag, LSyntaxErrorTag, LNotReducingTag, LTooManyReductionsTag } LerrorTag;
+typedef enum {
+    LInternalErrorTag,
+    LNotParseTag,
+    LSyntaxErrorTag,
+    LLexicalError,
+    LNotReducingTag,
+    LTooManyReductionsTag,
+    LerrorTagCount
+} LerrorTag;
 
 typedef struct Lterm Lterm;
 
@@ -79,12 +87,10 @@ Lterm* lam_app(Lterm fun[static 1], Lterm param[static 1]);
 Lterm* lam_internal_error(void);
 Lterm* lam_not_reducing(void);
 Lterm* lam_too_many_reductions(void);
+Lterm* lam_lexical_error(const char*);
 
 Lstr lam_get_form_name(const Lterm t[static 1]) ;
 void lam_free_term(Lterm* t) ;
-//static inline void lam_free_term_callback(void* t) {
-//    lam_free_term((Lterm*) t);
-//}
 
 Lterm* lam_clone(const Lterm t[static 1]) ;
 Lterm* lam_new_var(Lstr x) ;
@@ -126,4 +132,5 @@ void reduce_print_free_callback(Lterm* t[static 1], void* ignore);
 Lstr parse_string_rec_desc_to_str(const char* in, Lstr (*to_str)(const Lterm[static 1]));
 void free_term_callback(Lterm* tptr[static 1], void* ignore);
 Lstr parse_string_rec_desc_reduce_to_str(const char* in, Lstr (*to_str)(const Lterm[static 1]));
+const char* lam_error_to_str(LerrorTag error);
 #endif // __LAM_H_

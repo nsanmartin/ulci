@@ -8,20 +8,22 @@
 #include <str.h>
 #include <symbols.h>
 
+enum { LamMaxExpressionLen /* bytes */ = 1000000 };
 
 const char* LamTokenNames[] = {
-    [LDot]       = "Dot",
-    [LLparen]    = "Lparen",
-    [LRparen]    = "Rparen",
-    [LLambda]    = "Lambda",
-    [LVar]       = "Var",
-    [LName]      = "Name",
-    [LSet]       = "Set",
-    [LEquals]    = "=",
-    [LEol]       = "Eol\n",
-    [LSemicolon] = ";",
-    [LEof]       = "EOF",
-    [LError]     = "Error",
+    [LDot]                = "Dot",
+    [LLparen]             = "Lparen",
+    [LRparen]             = "Rparen",
+    [LLambda]             = "Lambda",
+    [LVar]                = "Var",
+    [LName]               = "Name",
+    [LSet]                = "Set",
+    [LEquals]             = "=",
+    [LEol]                = "Eol\n",
+    [LSemicolon]          = ";",
+    [LEof]                = "EOF",
+    [LErrorInputTooLarge] = "Error: input too large",
+    [LError]              = "Error",
 };
 
 
@@ -36,6 +38,7 @@ StrIter _lam_scan_str_iter = { .buf=0x0, .ix=0, .len=0 };
 
 char lam_getc_str(LamKeywordBuf buf[static 1]) {
     if (_lam_scan_str_iter.ix <  _lam_scan_str_iter.len) {
+        ++buf->read_so_far;
         ++buf->col;
         return _lam_scan_str_iter.buf[_lam_scan_str_iter.ix++];
     }
@@ -57,7 +60,7 @@ int lam_ungetc_str(LamKeywordBuf buf[static 1], char c) {
 
 // Scan from file:
 FILE* _lam_scan_file = 0x0;
-char lam_getc_file(LamKeywordBuf buf[static 1]) { ++buf->col; return fgetc(_lam_scan_file); }
+char lam_getc_file(LamKeywordBuf buf[static 1]) { ++buf->read_so_far; ++buf->col; return fgetc(_lam_scan_file); }
 int lam_ungetc_file(LamKeywordBuf buf[static 1], char c) { --buf->col; return ungetc(c, _lam_scan_file); }
 //TODO: avoid using global state and use thelexer context instead
 
@@ -88,6 +91,12 @@ LamTokenTag lam_scan_next(LamKeywordBuf buf[static 1]) {
     char c = _lam_getc(buf);
     for (; isblank(c) ; c = _lam_getc(buf))
         ;
+    if (buf->read_so_far > LamMaxExpressionLen) {
+        for (; c != '\n' && c != ';' && c != EOF && c != '\0'; c = _lam_getc(buf))
+            ;
+        buf->read_so_far = 0;
+        return LErrorInputTooLarge;
+    }
     switch(c) {
         case '.': return LDot;
         case '(': return LLparen;

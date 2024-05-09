@@ -9,6 +9,7 @@ typedef struct {
     char s[LamMaxKeywordLen];
     size_t len;
     size_t col;
+    size_t read_so_far;
     // rename to LamLexerCtx
 } LamKeywordBuf;
 
@@ -24,6 +25,7 @@ typedef enum {
     LEol,
     LSemicolon,
     LEof,
+    LErrorInputTooLarge,
     LError,
     LamTokenTagsLen
 } LamTokenTag;
