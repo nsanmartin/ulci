@@ -87,4 +87,4 @@ A
 \t.y
 ```
 
-[repo](https://codeberg.org/nsm/ulci.git)
+[repo](https://codeberg.org/nsm/ulci.git): https://codeberg.org/nsm/ulci.git
