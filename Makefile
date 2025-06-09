@@ -26,6 +26,7 @@ FLEXBISON_OBJ=$(FLEX_OBJ) $(BISON_OBJ)
 PARSER_UTIL=$(PARSER_DIR)/parser-lam-reader.c 
 PARSER_SRCS=$(wildcard $(PARSER_DIR)/*.c)
 
+ulci: build/ulci
 all: build/filter_ok build/ulci build/lexer build/bison-generated run-tests
 
 run-tests: $(BUILD)/utests $(BUILD)/itests

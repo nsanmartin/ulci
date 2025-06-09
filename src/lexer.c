@@ -88,7 +88,7 @@ const char* lam_token_to_str(LamTokenTag tk) {
 }
 
 LamTokenTag lam_scan_next(LamKeywordBuf buf[static 1]) {
-    char c = _lam_getc(buf);
+    int c = _lam_getc(buf);
     for (; isblank(c) ; c = _lam_getc(buf))
         ;
     if (buf->read_so_far > LamMaxExpressionLen) {

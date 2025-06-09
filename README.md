@@ -48,7 +48,7 @@ nor `itests` need that dependency.
 
 ```
 mkdir build
-make build/ulci
+make ulci
 ```
 
 ## Run
@@ -87,3 +87,4 @@ A
 \t.y
 ```
 
+[repo](https://codeberg.org/nsm/ulci.git)
